@@ -32,7 +32,7 @@ src/
 
 - Node.js 18+
 - Docker y Docker Compose
-- npm o yarn
+- pnpm
 
 ### Pasos
 
@@ -44,7 +44,7 @@ src/
 
 2. **Instalar dependencias**
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Configurar variables de entorno**
@@ -56,20 +56,20 @@ src/
 4. **Iniciar la base de datos PostgreSQL con Docker**
    ```bash
    # Iniciar el contenedor de PostgreSQL
-   npm run docker:up
+   pnpm docker:up
 
    # Verificar que está corriendo
-   npm run docker:logs
+   pnpm docker:logs
    ```
 
 5. **Compilar y ejecutar la aplicación**
    ```bash
    # Modo desarrollo (con hot-reload)
-   npm run start:dev
+   pnpm start:dev
 
    # O compilar y ejecutar en modo producción
-   npm run build
-   npm run start:prod
+   pnpm build
+   pnpm start:prod
    ```
 
 6. **Verificar que funciona**
@@ -80,13 +80,13 @@ src/
 
 ```bash
 # Iniciar PostgreSQL
-npm run docker:up
+pnpm docker:up
 
 # Detener PostgreSQL
-npm run docker:down
+pnpm docker:down
 
 # Ver logs
-npm run docker:logs
+pnpm docker:logs
 ```
 
 ### Variables de Entorno
@@ -105,22 +105,22 @@ npm run docker:logs
 
 ```bash
 # Desarrollo
-npm run start:dev          # Modo desarrollo (watch)
-npm run build              # Compilar TypeScript
-npm run start:prod         # Producción
+pnpm start:dev          # Modo desarrollo (watch)
+pnpm build              # Compilar TypeScript
+pnpm start:prod         # Producción
 
 # Testing
-npm run test               # Tests unitarios
-npm run test:e2e           # Tests E2E
+pnpm test               # Tests unitarios
+pnpm test:e2e           # Tests E2E
 
 # Docker
-npm run docker:up          # Iniciar PostgreSQL
-npm run docker:down        # Detener PostgreSQL
-npm run docker:logs        # Ver logs de PostgreSQL
+pnpm docker:up          # Iniciar PostgreSQL
+pnpm docker:down        # Detener PostgreSQL
+pnpm docker:logs        # Ver logs de PostgreSQL
 
 # Verificación
 npx tsc --noEmit          # Verificar tipos
-npm run lint              # Ejecutar linter
+pnpm lint              # Ejecutar linter
 ```
 
 ## Documentación

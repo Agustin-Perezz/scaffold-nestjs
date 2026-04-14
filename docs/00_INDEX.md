@@ -1,100 +1,83 @@
-# Rentadora Autos API - Documentación
+# Books API - Documentation
 
-> Sistema de renta de autos construido con NestJS y Clean Architecture
+> REST API for managing books, built with NestJS and Clean Architecture
 
-## Tabla de Contenidos
+## Table of Contents
 
-| # | Documento | Descripción |
-|---|-----------|-------------|
-| 00 | [INDEX](00_INDEX.md) | Este archivo - índice general |
-| 01 | [ARQUITECTURA](01_ARQUITECTURA.md) | Visión general de la arquitectura Clean Architecture |
-| 02 | [ENTIDADES](02_ENTIDADES.md) | Entidades de dominio (Auto, Cliente, Reserva) |
-| 03 | [CASOS_DE_USO](03_CASOS_DE_USO.md) | Catálogo completo de casos de uso |
-| 04 | [API](04_API.md) | Endpoints REST y documentación Swagger |
-| 05 | [MAQUINA_ESTADOS](05_MAQUINA_ESTADOS.md) | Máquina de estados de reservas |
-| 06 | [EXCEPCIONES](06_EXCEPCIONES.md) | Excepciones personalizadas y filtros |
-| 07 | [TESTING](07_TESTING.md) | Guía de pruebas E2E |
+| # | Document | Description |
+|---|----------|-------------|
+| 00 | [INDEX](00_INDEX.md) | This file - general index |
+| 01 | [ARCHITECTURE](01_ARCHITECTURE.md) | Clean Architecture overview |
+| 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Book) |
+| 03 | [USE_CASES](03_USE_CASES.md) | Complete use case catalog |
+| 04 | [API](04_API.md) | REST endpoints and Swagger documentation |
+| 07 | [TESTING](07_TESTING.md) | E2E testing guide |
+| — | [USE_CASE_PATTERN](USE_CASE_PATTERN.md) | Use case isolation pattern guide |
 
 ---
 
-## Vista Rápida
+## Quick View
 
 ```mermaid
 graph TB
-    subgraph Presentación
-        C_A[Autos Controller]
-        C_C[Clientes Controller]
-        C_R[Reservas Controller]
+    subgraph Presentation
+        C_B[Books Controller]
     end
 
-    subgraph Aplicación
-        UC_A[Casos de Uso Autos]
-        UC_C[Casos de Uso Clientes]
-        UC_R[Casos de Uso Reservas]
+    subgraph Application
+        UC_B[Books Use Cases]
     end
 
-    subgraph Dominio
-        E_A[Auto]
-        E_C[Cliente]
-        E_R[Reserva]
-        SM[State Machine]
+    subgraph Domain
+        E_B[Book]
     end
 
-    subgraph Infraestructura
+    subgraph Infrastructure
         DB[(PostgreSQL)]
-        REP[Repositorios]
-        EXC[Exception Filters]
+        REP[Repositories]
     end
 
-    C_A --> UC_A
-    C_C --> UC_C
-    C_R --> UC_R
-
-    UC_A --> E_A
-    UC_C --> E_C
-    UC_R --> E_R
-    UC_R --> SM
-
+    C_B --> UC_B
+    UC_B --> E_B
     REP --> DB
-    EXC --> DB
 ```
 
 ---
 
-## Comandos Principales
+## Main Commands
 
 ```bash
-# Desarrollo
-npm run build              # Compilar TypeScript
-npm run start:dev          # Modo desarrollo (watch)
-npm run start:prod         # Producción
+# Development
+pnpm build              # Compile TypeScript
+pnpm start:dev          # Development mode (watch)
+pnpm start:prod         # Production
 
 # Testing
-npm run test               # Tests unitarios
-npm run test:e2e           # Tests E2E
+pnpm test               # Unit tests
+pnpm test:e2e           # E2E tests
 
-# Verificación
-npx tsc --noEmit          # Verificar tipos
+# Verification
+npx tsc --noEmit        # Type check
 ```
 
 ---
 
-## URLs Importantes
+## Important URLs
 
-| Servicio | URL |
-|----------|-----|
+| Service | URL |
+|---------|-----|
 | API | http://localhost:3000 |
-| Swagger | http://localhost:3000/api/docs |
-| Base de datos | PostgreSQL (ver docker-compose.yml) |
+| Swagger | http://localhost:3000/api |
+| Database | PostgreSQL (see docker-compose.yml) |
 
 ---
 
-## Tecnologías
+## Technologies
 
 - **Runtime**: Node.js
 - **Framework**: NestJS 10.x
 - **ORM**: MikroORM 6.x
-- **Base de datos**: PostgreSQL
-- **Validación**: class-validator
-- **Documentación**: Swagger (OpenAPI 3.0)
+- **Database**: PostgreSQL
+- **Validation**: class-validator
+- **Documentation**: Swagger (OpenAPI 3.0)
 - **Testing**: Jest + Supertest

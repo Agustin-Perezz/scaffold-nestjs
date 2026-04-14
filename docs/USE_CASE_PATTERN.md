@@ -1,101 +1,102 @@
-# Guía de Arquitectura de Casos de Uso
+# Use Case Architecture Guide
 
-> Entendiendo el enfoque de Clean Architecture para casos de uso
----
-
-## Tabla de Contenidos
-
-1. [Resumen](#resumen)
-2. [Patrón de Aislamiento de Casos de Uso](#patrón-de-aislamiento-de-casos-de-uso)
-3. [Estructura de Carpetas](#estructura-de-carpetas)
-4. [Organización de Archivos](#organización-de-archivos)
-5. [Repository por Operación](#repository-por-operación)
-6. [Diseño Guiado por el Dominio](#diseño-guiado-por-el-dominio)
-7. [Objetos de Transferencia de Datos (DTOs)](#objetos-de-transferencia-de-datos-dtos)
-8. [Patrón Transaccional](#patrón-transaccional)
-9. [Protección de Límites](#protección-de-límites)
-10. [Documentación por Caso de Uso](#documentación-por-caso-de-uso)
+> Understanding the Clean Architecture approach to use cases
 
 ---
 
-## Resumen
+## Table of Contents
 
-Esta arquitectura sigue el **Aislamiento de Casos de Uso** — un patrón estricto de Clean Architecture donde cada operación de negocio se encapsula en su propia carpeta aislada con archivos dedicados para la implementación del caso de uso, objetos de transferencia de datos (DTOs) e interfaces de repository.
+1. [Summary](#summary)
+2. [Use Case Isolation Pattern](#use-case-isolation-pattern)
+3. [Folder Structure](#folder-structure)
+4. [File Organization](#file-organization)
+5. [Repository per Operation](#repository-per-operation)
+6. [Domain-Driven Design](#domain-driven-design)
+7. [Data Transfer Objects (DTOs)](#data-transfer-objects-dtos)
+8. [Transactional Pattern](#transactional-pattern)
+9. [Boundary Protection](#boundary-protection)
+10. [Use Case Documentation](#use-case-documentation)
 
-### Principios Clave
+---
 
-| Principio | Descripción |
+## Summary
+
+This architecture follows **Use Case Isolation** — a strict Clean Architecture pattern where each business operation is encapsulated in its own isolated folder with dedicated files for the use case implementation, data transfer objects (DTOs), and repository interfaces.
+
+### Key Principles
+
+| Principle | Description |
 |-----------|-------------|
-| **Responsabilidad Única** | Cada caso de uso hace exactamente una cosa |
-| **Aislamiento** | No hay repositories compartidos entre casos de uso |
-| **Testabilidad** | Cada caso de uso puede probarse independientemente |
-| **Descubribilidad** | La documentación del caso de uso vive junto al código |
+| **Single Responsibility** | Each use case does exactly one thing |
+| **Isolation** | No shared repositories between use cases |
+| **Testability** | Each use case can be tested independently |
+| **Discoverability** | Use case documentation lives next to the code |
 
-### Por Qué la Documentación Vive con el Código
+### Why Documentation Lives with the Code
 
-Co-ubicar archivos README.md junto a las implementaciones de casos de uso asegura:
-- **La documentación se mantiene actual**: Cuando el código cambia, el README adyacente es un recordatorio visible para actualizar la documentación
-- **Sin adivinar**: Al mirar la carpeta inmediatamente sabés qué está implementado y documentado
-- **Las revisiones de código incluyen documentación**: Los revisores de PR ven los cambios de documentación junto con los cambios de código
-- **Disponibilidad offline**: Sin dependencia de sistemas de documentación externos
+Co-locating README.md files next to use case implementations ensures:
+- **Documentation stays current**: When code changes, the adjacent README is a visible reminder to update documentation
+- **No guessing**: Looking at the folder immediately tells you what is implemented and documented
+- **Code reviews include documentation**: PR reviewers see documentation changes alongside code changes
+- **Offline availability**: No dependency on external documentation systems
 
 ---
 
-## Patrón de Aislamiento de Casos de Uso
+## Use Case Isolation Pattern
 
-### La Regla: Una Operación = Una Carpeta
+### The Rule: One Operation = One Folder
 
-Cada operación CRUD (y operación de negocio) tiene su propia carpeta:
+Each CRUD (and business) operation has its own folder:
 
 ```
-application/use-cases/{dominio}/{acción}-{entidad}/
-├── {acción}-{entidad}.use-case.ts              # Implementación
-├── {acción}-{entidad}.request.dto.ts           # Validación de entrada
-├── {acción}-{entidad}.response.dto.ts          # Estructura de salida
-├── {acción}-{entidad}.repository.interface.ts  # Contrato de repository
-└── README.md                                  # Documentación del caso de uso
+application/use-cases/{domain}/{action}-{entity}/
+├── {action}-{entity}.use-case.ts              # Implementation
+├── {action}-{entity}.request.dto.ts           # Input validation
+├── {action}-{entity}.response.dto.ts          # Output shape
+├── {action}-{entity}.repository.interface.ts  # Repository contract
+└── README.md                                  # Use case documentation
 ```
 
-### Por Qué No Fat Repositories?
+### Why Not Fat Repositories?
 
-Los fat repositories pueden parecer convenientes, pero crean problemas arquitectónicos significativos:
+Fat repositories may seem convenient, but they create significant architectural problems:
 
-**Problemas de Rendimiento**: Los fat repositories fomentan el uso cruzado entre casos de uso, donde operaciones no relacionadas se agrupan. Esto lleva a:
-- **Sobre-carga**: Cargando datos que casos de uso específicos no necesitan
-- **Consultas extra a la base de datos**: Los métodos genéricos a menudo requieren múltiples viajes para satisfacer casos de uso específicos
-- **Contención de locks**: Las transacciones amplias mantienen locks por más tiempo del necesario
+**Performance Issues**: Fat repositories encourage cross-use-case reuse, where unrelated operations get grouped. This leads to:
+- **Over-fetching**: Loading data that specific use cases don't need
+- **Extra database queries**: Generic methods often require multiple round-trips to satisfy specific use cases
+- **Lock contention**: Broad transactions hold locks longer than necessary
 
-**Mala Descubribilidad**: Cuando algo se rompe, tenés que adivinar cuál de los 15 métodos del fat repository podría estar involucrado. Con repositories aislados, empezás a buscar en exactamente un lugar: la carpeta del caso de uso.
+**Poor Discoverability**: When something breaks, you have to guess which of the 15 fat repository methods might be involved. With isolated repositories, you start looking in exactly one place: the use case folder.
 
-**Acoplamiento Oculto**: "Solo reutilicemos el repository existente" parece eficiente, pero acopla casos de uso no relacionados a través de patrones de acceso a datos compartidos. Los cambios para un caso de uso arriesgan romper otros.
+**Hidden Coupling**: "Let's just reuse the existing repository" seems efficient, but it couples unrelated use cases through shared data access patterns. Changes for one use case risk breaking others.
 
-**Casos de Uso como Servicios de Aplicación**: Cada caso de uso es esencialmente un Servicio de Aplicación con una responsabilidad única. Repository por operación mantiene los límites del servicio limpios y previene abstracciones que filtran.
+**Use Cases as Application Services**: Each use case is essentially an Application Service with a single responsibility. Repository per operation keeps service boundaries clean and prevents leaky abstractions.
 
-**❌ NO Permitido:**
+**❌ NOT Allowed:**
 ```typescript
-// Fat repository — acopla casos de uso juntos
-// Si necesitás optimizar cómo se listan los contactos,
-// arriesgás romper create, update y delete
+// Fat repository — couples use cases together
+// If you need to optimize how contacts are listed,
+// you risk breaking create, update, and delete
 export interface IContactRepository {
     create(contact: Contact): Promise<Contact>;
     get(id: string): Promise<Contact | null>;
-    list(userId: string): Promise<Contact[]>;        // Genérico — a menudo sobre-carga
+    list(userId: string): Promise<Contact[]>;        // Generic — often over-fetches
     update(contact: Contact): Promise<Contact>;
     delete(id: string): Promise<void>;
 }
 ```
 
-**✅ Correcto:**
+**✅ Correct:**
 ```typescript
-// ICreateContactRepository.ts — hiper-específico para esta operación
-// Solo consultas necesarias para la creación de contactos
+// ICreateContactRepository.ts — hyper-specific for this operation
+// Only queries needed for contact creation
 export interface ICreateContactRepository {
     create(contact: Contact): Promise<Contact>;
     existsByEmail(userId: string, email: string): Promise<boolean>;
 }
 
-// IGetContactRepository.ts — archivo separado, preocupaciones separadas
-// Puede optimizarse independientemente sin afectar la lógica de creación
+// IGetContactRepository.ts — separate file, separate concerns
+// Can be optimized independently without affecting creation logic
 export interface IGetContactRepository {
     getById(id: string): Promise<Contact | null>;
 }
@@ -103,11 +104,11 @@ export interface IGetContactRepository {
 
 ---
 
-## Estructura de Carpetas
+## Folder Structure
 
-### Organización por Dominio
+### Organized by Domain
 
-Organizá los casos de uso por dominio (contexto delimitado), con cada operación en su propia carpeta:
+Organize use cases by domain (bounded context), with each operation in its own folder:
 
 ```
 application/use-cases/
@@ -119,76 +120,75 @@ application/use-cases/
 │   ├── create-user/
 │   ├── get-user/
 │   └── list-users/
-├── orders/
-│   ├── create-order/
-│   ├── get-order/
-│   └── list-orders/
-└── [tu-dominio]/
-    ├── [acción]-[entidad]/
+├── books/
+│   ├── create-book/
+│   ├── get-book/
+│   ├── list-books/
+│   ├── update-book/
+│   └── delete-book/
+└── [your-domain]/
+    ├── [action]-[entity]/
     └── ...
 ```
 
 ---
 
-## Organización de Archivos
+## File Organization
 
-### Archivos Estándar por Caso de Uso
+### Standard Files per Use Case
 
-Cada carpeta de caso de uso contiene estos archivos:
+Each use case folder contains these files:
 
-| Archivo | Propósito | Ejemplo |
-|---------|-----------|---------|
-| `{nombre}.use-case.ts` | Lógica central del caso de uso | `create-contact.use-case.ts` |
-| `{nombre}.request.dto.ts` | Validación de entrada | `create-contact.request.dto.ts` |
-| `{nombre}.response.dto.ts` | Estructura de salida | `create-contact.response.dto.ts` |
-| `{nombre}.repository.interface.ts` | Contrato de repository | `create-contact.repository.interface.ts` |
-| `README.md` | Documentación | Ver [Documentación por Caso de Uso](#documentación-por-caso-de-uso) |
+| File | Purpose | Example |
+|------|---------|---------|
+| `{name}.use-case.ts` | Core use case logic | `create-book.use-case.ts` |
+| `{name}.request.dto.ts` | Input validation | `create-book.request.dto.ts` |
+| `{name}.response.dto.ts` | Output shape | `create-book.response.dto.ts` |
+| `{name}.repository.interface.ts` | Repository contract | `create-book.repository.interface.ts` |
+| `README.md` | Documentation | See [Use Case Documentation](#use-case-documentation) |
 
-### Ejemplo: Caso de Uso Create Contact
+### Example: Create Book Use Case
 
 ```typescript
-// create-contact.use-case.ts
-import Contact from '../../../../domain/entities/contact.entity';
-import {CreateContactRequestDto} from './create-contact.request.dto';
-import {CreateContactResponseDto} from './create-contact.response.dto';
-import {ICreateContactRepository} from './create-contact.repository.interface';
+// create-book.use-case.ts
+import { Book } from '../../../../domain/entities/book.entity';
+import { CreateBookRequestDto } from './create-book.request.dto';
+import { CreateBookResponseDto } from './create-book.response.dto';
+import { ICreateBookRepository } from './create-book.repository.interface';
 
-export class CreateContactUseCase {
+export class CreateBookUseCase {
     constructor(
-        private readonly repository: ICreateContactRepository,
+        private readonly repository: ICreateBookRepository,
     ) {}
 
-    async execute(userId: string, request: CreateContactRequestDto): Promise<CreateContactResponseDto> {
-        // Chequeos de duplicados
-        if (request.email) {
-            const existsByEmail = await this.repository.existsByEmail(
-                userId,
-                request.email
-            );
-            if (existsByEmail) {
-                throw new Error(`Ya existe un contacto con ese email`);
-            }
+    async execute(dto: CreateBookRequestDto): Promise<CreateBookResponseDto> {
+        const isbnExists = await this.repository.existsByIsbn(dto.isbn);
+        if (isbnExists) {
+            throw new BadRequestException('A book with that ISBN already exists');
         }
 
-        // Crear entidad de dominio
-        const contact = Contact.create({
-            userId,
-            name: request.name,
-            email: request.email ?? null,
-            notes: request.notes ?? null,
+        const book = Book.create({
+            title: dto.title,
+            author: dto.author,
+            isbn: dto.isbn,
+            publicationYear: dto.publicationYear,
+            genre: dto.genre,
         });
 
-        // Persistir
-        const saved = await this.repository.create(contact);
-        return this.toResponseDto(saved);
+        const created = await this.repository.create(book);
+        return this.toResponseDto(created);
     }
 
-    private toResponseDto(contact: Contact): CreateContactResponseDto {
-        // Mapear entidad de dominio a DTO de respuesta
+    private toResponseDto(book: Book): CreateBookResponseDto {
         return {
-            id: contact.id,
-            name: contact.name,
-            // ... otros campos
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            isbn: book.isbn,
+            publicationYear: book.publicationYear,
+            genre: book.genre,
+            createdAt: book.createdAt,
+            updatedAt: book.updatedAt,
         };
     }
 }
@@ -196,466 +196,388 @@ export class CreateContactUseCase {
 
 ---
 
-## Repository por Operación
+## Repository per Operation
 
-### Ubicación de la Interfaz de Repository
+### Repository Interface Location
 
-El caso de uso **posee** su interfaz de repository:
+The use case **owns** its repository interface:
 
 ```typescript
-// create-contact.repository.interface.ts
-export interface ICreateContactRepository {
-    create(contact: Contact): Promise<Contact>;
-    existsByEmail(userId: string, email: string): Promise<boolean>;
+// create-book.repository.interface.ts
+export interface ICreateBookRepository {
+    create(book: Book): Promise<Book>;
+    existsByIsbn(isbn: string): Promise<boolean>;
 }
 ```
 
-### Ubicación de la Implementación de Repository
+### Repository Implementation Location
 
-Las implementaciones viven en la capa de Infraestructura:
+Implementations live in the Infrastructure layer:
 
 ```
-infrastructure/database/repositories/{dominio}/
-├── create-{entidad}.repository.ts
-├── get-{entidad}.repository.ts
-├── list-{entidad}s.repository.ts
-├── update-{entidad}.repository.ts
-└── delete-{entidad}.repository.ts
+infrastructure/database/repositories/{domain}/
+├── create-{entity}.repository.ts
+├── get-{entity}.repository.ts
+├── list-{entity}s.repository.ts
+├── update-{entity}.repository.ts
+└── delete-{entity}.repository.ts
 ```
 
-### Registro en el Módulo
+### Module Registration
 
-Registrá cada implementación de repository con su token de interfaz:
+Register each repository implementation with its interface token:
 
 ```typescript
-// Registro de inyección de dependencias
-container.register('ICreateContactRepository', CreateContactRepository);
-container.register('IGetContactRepository', GetContactRepository);
-// ... registro por caso de uso
-```
-
-O usando un enfoque basado en módulos:
-
-```typescript
-// module.ts
-export const useCaseProviders = [
-    { token: 'ICreateContactRepository', implementation: CreateContactRepository },
-    { token: 'IGetContactRepository', implementation: GetContactRepository },
-    // ... registro por caso de uso
-];
+// books.module.ts
+providers: [
+    { provide: 'ICreateBookRepository', useClass: CreateBookRepository },
+    { provide: 'IGetBookRepository', useClass: GetBookRepository },
+    // ... one per use case
+]
 ```
 
 ---
 
-## Diseño Guiado por el Dominio
+## Domain-Driven Design
 
-### Por Qué Entidades de Dominio Puras?
+### Why Pure Domain Entities?
 
-Las entidades de dominio sin dependencias de framework:
-- **Testables sin infraestructura**: Ejecutá tests unitarios sin base de datos ni ningún framework
-- **Lógica portable**: Las reglas de negocio pueden moverse entre frameworks (Express, Fastify, etc.)
-- **Intención de negocio explícita**: Métodos como `blacklist()` expresan conceptos de dominio, no operaciones técnicas
-- **Cambios de estado inmutables**: Los cambios de estado ocurren a través de métodos, no asignación directa de propiedades
+Domain entities without framework dependencies:
+- **Testable without infrastructure**: Run unit tests without a database or any framework
+- **Portable logic**: Business rules can move between frameworks (Express, Fastify, etc.)
+- **Explicit business intent**: Methods like `updateTitle()` express domain concepts, not technical operations
+- **Immutable state changes**: State changes happen through methods, not direct property assignment
 
-### Uso de Entidades de Dominio
+### Domain Entity Usage
 
-Los casos de usos operan sobre entidades de dominio puras:
+Use cases operate on pure domain entities:
 
 ```typescript
-// Entidad de dominio — sin decoradores de framework
-export class Contact {
+// Domain entity — no framework decorators
+export class Book {
     private readonly _id: string;
-    private _name: string;
-    private _isBlacklisted: boolean;
+    private _title: string;
     private _updatedAt: Date;
 
-    static create(props: { name: string }): Contact {
-        return new Contact(
-            generateId(),
-            props.name,
-            false,
-            new Date()
-        );
+    static create(props: { title: string; ... }): Book {
+        return new Book(uuidv7(), props.title, new Date());
     }
 
-    // Comportamiento de dominio expresado como métodos, no setters de propiedades
-    blacklist(): void {
-        this._isBlacklisted = true;
+    // Domain behavior expressed as methods, not property setters
+    updateTitle(title: string): void {
+        this._title = title;
         this._updatedAt = new Date();
     }
 
-    // Propiedades de solo lectura expuestas vía getters
+    // Read-only properties exposed via getters
     get id(): string { return this._id; }
-    get name(): string { return this._name; }
-    get isBlacklisted(): boolean { return this._isBlacklisted; }
+    get title(): string { return this._title; }
 }
 ```
 
-### Patrón Factory
+### Factory Pattern
 
-Siempre usá métodos factory, nunca constructores:
-
-```typescript
-// ✅ Correcto
-const contact = Contact.create({...});
-
-// ❌ Mal — el constructor es privado
-const contact = new Contact(...);
-```
-
-### Por Qué Métodos Factory?
-
-Los métodos factory proveen beneficios arquitectónicos que los constructores no pueden:
-
-**Construcción Nombrada**: `Contact.createVerified()` vs `new Contact(..., true, ...)` — la intención es clara desde el nombre del método, no de flags booleanos. Los constructores siempre se nombran según la clase; los factories pueden tener nombres descriptivos para cada escenario de creación.
-
-**Testabilidad**: Podés stubbear o espiar `Contact.create` en tests, lo cual es imposible con el operador `new`. Esto permite a los tests controlar la creación de objetos sin frameworks de inyección de dependencias.
-
-### Por Qué Comportamiento a Través de Métodos?
-
-El comportamiento de dominio se expresa como métodos, no setters de propiedades:
+Always use factory methods, never constructors:
 
 ```typescript
-// ✅ La intención de negocio es clara
-contact.blacklist();
-contact.activate();
-contact.mergeWith(otherContact);
+// ✅ Correct
+const book = Book.create({...});
 
-// ❌ No queda claro qué significan estas operaciones
-contact.isBlacklisted = true;
-contact.status = 'active';
+// ❌ Wrong — constructor is private
+const book = new Book(...);
 ```
 
-**Encapsulación**: Los métodos ocultan cambios de estado internos. `blacklist()` podría setear un flag, loguear una entrada de auditoría y actualizar un timestamp — quienes llaman no necesitan saberlo.
+### Why Factory Methods?
 
-**Verificación de Invariantes**: Los métodos validan antes de cambiar el estado. `setEmail()` puede chequear formato y unicidad; la asignación directa no puede.
+Factory methods provide architectural benefits that constructors cannot:
 
-**Lenguaje de Dominio**: Métodos nombrados según conceptos de negocio (`suspend()`, `promote()`, `archive()`) hacen el código legible para expertos del dominio.
+**Named Construction**: `Book.create()` vs `new Book(...)` — the intent is clear from the method name, not from positional arguments. Constructors are always named after the class; factories can have descriptive names for each creation scenario.
 
-**Efectos Secundarios**: Eventos de dominio (ej. "ContactWasBlacklisted") pueden emitirse desde métodos, no de asignaciones de propiedades.
+**Testability**: You can stub or spy on `Book.create` in tests, which is impossible with the `new` operator. This allows tests to control object creation without dependency injection frameworks.
 
-### Por Qué Getters?
+### Why Behavior Through Methods?
 
-Exponiendo propiedades de solo lectura vía getters:
+Domain behavior is expressed as methods, not property setters:
+
+```typescript
+// ✅ Business intent is clear
+book.updateTitle('New Title');
+
+// ❌ What does this operation mean in domain terms?
+book.title = 'New Title';
+```
+
+**Encapsulation**: Methods hide internal state changes. `updateTitle()` sets the field and updates the timestamp — callers don't need to know.
+
+**Invariant Checking**: Methods validate before changing state. Direct assignment cannot.
+
+**Domain Language**: Methods named after business concepts (`publish()`, `archive()`) make code readable to domain experts.
+
+### Why Getters?
+
+Exposing read-only properties via getters:
 
 ```typescript
 get id(): string { return this._id; }
 ```
 
-**Acceso de Solo Lectura**: El código externo puede observar el estado pero no corromperlo mediante asignación directa.
+**Read-Only Access**: External code can observe state but cannot corrupt it via direct assignment.
 
-**Encapsulación**: La representación interna puede cambiar (ej. `_id` se convierte en un Value Object) sin afectar quienes llaman.
+**Encapsulation**: Internal representation can change (e.g., `_id` becomes a Value Object) without affecting callers.
 
-**Propiedades Computadas**: Los getters pueden derivar valores bajo demanda sin almacenar estado redundante.
-
-**Copia Defensiva**: Los getters pueden retornar copias de objetos mutables (arrays, fechas) para prevenir modificación externa.
+**Computed Properties**: Getters can derive values on demand without storing redundant state.
 
 ---
 
-## Objetos de Transferencia de Datos (DTOs)
+## Data Transfer Objects (DTOs)
 
-### Por Qué DTOs?
+### Why DTOs?
 
-Los DTOs desacoplan los modelos internos de dominio de las interfaces externas:
+DTOs decouple internal domain models from external interfaces:
 
 ```typescript
-// DTO de Request — lo que el llamador provee
-export class CreateContactRequestDto {
-    name: string;
-    email?: string;
+// Request DTO — what the caller provides
+export class CreateBookRequestDto {
+    title: string;
+    author: string;
+    isbn: string;
+    publicationYear: number;
+    genre?: string;
 }
 
-// DTO de Response — lo que el caso de uso devuelve
-export class CreateContactResponseDto {
+// Response DTO — what the use case returns
+export class CreateBookResponseDto {
     id: string;
-    name: string;
-    email: string | null;
+    title: string;
+    author: string;
+    isbn: string;
+    publicationYear: number;
+    genre: string | null;
     createdAt: Date;
+    updatedAt: Date;
 }
 ```
 
-**Separación de Validación**: Los DTOs de request validan en el límite (usando librerías de validación) antes de que los datos lleguen a la lógica de dominio. Las entradas inválidas se rechazan temprano.
+**Validation Separation**: Request DTOs validate at the boundary (using validation libraries) before data reaches domain logic. Invalid inputs are rejected early.
 
-**Estabilidad de Contrato**: El contrato de la API (DTOs) puede permanecer estable mientras el modelo de dominio evoluciona. Agregar un campo a la entidad Contact no lo expone automáticamente a quienes llaman.
+**Contract Stability**: The API contract (DTOs) can remain stable while the domain model evolves. Adding a field to the Book entity does not automatically expose it to callers.
 
-**Seguridad**: Los DTOs previenen filtración accidental de datos. Campos sensibles (contraseñas, IDs internos) no se exponen a menos que se incluyan explícitamente en el DTO de respuesta.
+**Security**: DTOs prevent accidental data leakage. Sensitive fields are not exposed unless explicitly included in the response DTO.
 
-**Desacoplamiento**: Los cambios al dominio (ej. dividir `name` en `firstName` y `lastName`) no requieren cambios a quienes llaman si el DTO permanece compatible.
+**Decoupling**: Changes to the domain (e.g., splitting `title` into `shortTitle` and `subtitle`) don't require changes to callers if the DTO remains compatible.
 
-### Capas de Mapeo
+### Mapping Layers
 
-Los casos de uso actúan como la capa de mapeo entre DTOs y entidades de dominio:
+Use cases act as the mapping layer between DTOs and domain entities:
 
 ```typescript
-// DTO de Request → Entidad de Dominio
-const contact = Contact.create({
-    name: request.name,
-    email: request.email ?? null,
+// Request DTO → Domain Entity
+const book = Book.create({
+    title: request.title,
+    author: request.author,
+    isbn: request.isbn,
+    publicationYear: request.publicationYear,
+    genre: request.genre ?? null,
 });
 
-// Entidad de Dominio → DTO de Response
+// Domain Entity → Response DTO
 return {
-    id: contact.id,
-    name: contact.name,
-    email: contact.email,
-    createdAt: contact.createdAt,
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    isbn: book.isbn,
+    publicationYear: book.publicationYear,
+    genre: book.genre,
+    createdAt: book.createdAt,
+    updatedAt: book.updatedAt,
 };
 ```
 
 ---
 
-## Patrón Transaccional
+## Transactional Pattern
 
-### Por Qué las Transacciones Son Mandatorias
+### Why Transactions Are Mandatory
 
-Sin transacciones explícitas:
-- **Fallos parciales**: Las operaciones de base de datos pueden completarse parcialmente, dejando datos en estados inconsistentes
-- **Fugas de conexión**: Trabajo no commiteado mantiene conexiones de base de datos abiertas por más tiempo
-- **Condiciones de carrera**: Operaciones concurrentes ven estados intermedios
-- **Rollback imposible**: Errores después de escrituras parciales no pueden deshacerse limpiamente
+Without explicit transactions:
+- **Partial failures**: Database operations may complete partially, leaving data in inconsistent states
+- **Connection leaks**: Uncommitted work holds database connections open longer
+- **Race conditions**: Concurrent operations see intermediate states
+- **Impossible rollback**: Errors after partial writes cannot be cleanly undone
 
-### Todas las Operaciones de DB Deben ser Transaccionales
+### All DB Operations Must Be Transactional
 
 ```typescript
-// ✅ Correcto
-async create(contact: Contact): Promise<Contact> {
-    return await this.transactionManager.execute(async (trx) => {
-        const saved = await this.repository.create(contact, trx);
+// ✅ Correct
+async create(book: Book): Promise<Book> {
+    return await this.orm.em.transactional(async (em) => {
+        const saved = await em.persist(book).flush();
         return saved;
     });
-    // Transacción automáticamente commiteada en éxito,
-    // hecha rollback en error
+    // Transaction automatically committed on success,
+    // rolled back on error
 }
 
-// ❌ Mal — nunca fuera de transacción
-await this.repository.create(contact);
-// Si esto falla, la entidad puede estar parcialmente persistida
-// sin forma de hacer rollback
+// ❌ Wrong — never outside a transaction
+await this.em.persist(book).flush();
+// If this fails, the entity may be partially persisted
+// with no way to roll back
 ```
 
 ---
 
-## Protección de Límites
+## Boundary Protection
 
-### Repositories Trabajan con Entidades
+### Repositories Work with Entities
 
-Los repositories son el puente entre dominio e infraestructura. Aceptan y devuelven entidades de dominio, no filas de base de datos u objetos ORM:
+Repositories are the bridge between domain and infrastructure. They accept and return domain entities, not database rows or ORM objects:
 
 ```typescript
-// ✅ El repository acepta y devuelve entidades de dominio
-export interface ICreateContactRepository {
-    create(contact: Contact): Promise<Contact>;
+// ✅ Repository accepts and returns domain entities
+export interface ICreateBookRepository {
+    create(book: Book): Promise<Book>;
 }
 
-// La implementación mapea entre entidad y modelo de persistencia
-class CreateContactRepository implements ICreateContactRepository {
-    async create(contact: Contact): Promise<Contact> {
-        const row = {
-            id: contact.id,
-            name: contact.name,
-            email: contact.email,
-        };
-        await db.insert('contacts', row);
-        return contact;  // Devolver la entidad, no la fila
+// Implementation maps between entity and persistence model
+class CreateBookRepository implements ICreateBookRepository {
+    async create(book: Book): Promise<Book> {
+        const entity = this.em.create(BookEntity, {
+            id: book.id,
+            title: book.title,
+            author: book.author,
+        });
+        await this.em.persist(entity).flush();
+        return book;  // Return the domain entity, not the ORM entity
     }
 }
 ```
 
-**Integridad de Dominio**: El modelo de dominio permanece puro. El repository maneja el mapeo complicado entre entidades y estructuras de persistencia.
+**Domain Integrity**: The domain model stays pure. The repository handles the complicated mapping between entities and persistence structures.
 
-**Infraestructura Intercambiable**: Podés cambiar de SQL a MongoDB sin tocar casos de uso — solo cambian las implementaciones de repository.
+**Swappable Infrastructure**: You can switch from SQL to MongoDB without touching use cases — only repository implementations change.
 
-**Testabilidad**: Los repositories pueden mockearse con implementaciones en memoria que trabajen con entidades, sin base de datos requerida.
+**Testability**: Repositories can be mocked with in-memory implementations that work with entities, no database required.
 
-**Sin Abstracciones que Filtran**: Quienes llaman nunca ven específicos de base de datos (nombres de tablas, tipos de columnas, JOINs). Trabajan solo con conceptos de dominio.
+**No Leaky Abstractions**: Callers never see database specifics (table names, column types, JOINs). They work only with domain concepts.
 
-### Casos de Uso No se Llaman Entre Sí
+### Use Cases Don't Call Each Other
 
-Cada caso de uso es un punto de entrada standalone. Nunca se invocan directamente entre sí:
+Each use case is a standalone entry point. They never invoke each other directly:
 
 ```typescript
-// ❌ MAL — casos de uso llamándose entre sí
+// ❌ WRONG — use cases calling each other
 export class CreateOrderUseCase {
     constructor(
-        private readonly getProductUseCase: GetProductUseCase,  // No hagas esto
+        private readonly getProductUseCase: GetProductUseCase,  // Don't do this
     ) {}
-
-    async execute(request: CreateOrderRequest) {
-        const product = await this.getProductUseCase.execute({  // ¡Acoplamiento fuerte!
-            id: request.productId,
-        });
-        // ...
-    }
 }
 ```
 
 ```typescript
-// ✅ CORRECTO — el caso de uso orquesta, el repository provee acceso a datos
+// ✅ CORRECT — use case orchestrates via repository
 export class CreateOrderUseCase {
     constructor(
         private readonly repository: ICreateOrderRepository,
     ) {}
 
     async execute(request: CreateOrderRequest) {
-        // Reglas de negocio que requieren acceso a datos
         const productIds = request.items.map(item => item.productId);
-
         const existenceMap = await this.repository.productsExist(productIds);
         const missingProducts = productIds.filter(id => !existenceMap[id]);
         if (missingProducts.length > 0) {
-            throw new ProductNotFoundError(`Productos no encontrados: ${missingProducts.join(', ')}`);
+            throw new ProductNotFoundError(`Products not found: ${missingProducts.join(', ')}`);
         }
 
-        // NOTA: Podría haber una condición de carrera aquí, en un escenario real chequearíamos niveles de stock,
-        // reservaríamos el stock, y luego crearíamos la orden.
-        const stockLevels = await this.repository.getStockForProducts(productIds);
-        for (const item of request.items) {
-            const available = stockLevels[item.productId] ?? 0;
-            if (available < item.quantity) {
-                throw new InsufficientStockError(`Stock insuficiente para el producto ${item.productId}`);
-            }
-        }
-
-        // Delegar a la entidad de dominio para reglas de negocio puras
-        // Order.create valida: items no vacíos, cantidades positivas, precios no negativos
-        const order = Order.create({
-            items: request.items,
-        });
-
+        const order = Order.create({ items: request.items });
         return this.repository.create(order);
-    }
-}
-
-// Interfaz de repository — provee datos, no lógica de negocio
-interface ICreateOrderRepository {
-    productsExist(productIds: string[]): Promise<Record<string, boolean>>;
-    getStockForProducts(productIds: string[]): Promise<Record<string, number>>;
-    create(order: Order): Promise<Order>;
-}
-
-// Implementación — solo consultas SQL, sin decisiones de negocio
-class CreateOrderRepository implements ICreateOrderRepository {
-    constructor(private readonly db: Database) {}
-
-    async productsExist(productIds: string[]): Promise<Record<string, boolean>> {
-        const results = await this.db.query(
-            'SELECT id FROM products WHERE id IN (?)',
-            [productIds]
-        );
-        const existingIds = new Set(results.map((r: any) => r.id));
-        const existenceMap: Record<string, boolean> = {};
-        for (const id of productIds) {
-            existenceMap[id] = existingIds.has(id);
-        }
-        return existenceMap;
-    }
-
-    async getStockForProducts(productIds: string[]): Promise<Record<string, number>> {
-        const results = await this.db.query(
-            'SELECT product_id, stock FROM inventory WHERE product_id IN (?)',
-            [productIds]
-        );
-        // Devolver mapeo de productId a nivel de stock
-        const stockMap: Record<string, number> = {};
-        for (const row of results) {
-            stockMap[row.product_id] = row.stock;
-        }
-        return stockMap;
-    }
-
-    async create(order: Order): Promise<Order> {
-        // Persistir orden e items...
     }
 }
 ```
 
-**Punto de Entrada Único**: Cada caso de uso representa una intención de usuario. Si necesitás la misma lógica en dos lugares, extraé la lógica de dominio compartida en la entidad o un servicio de dominio, no en un caso de uso.
+**Single Entry Point**: Each use case represents a user intent. If you need the same logic in two places, extract the shared domain logic into the entity or a domain service, not into another use case.
 
-**Límites de Transacción**: Cada caso de uso define su propio alcance transaccional. Llamar a otro caso de uso podría commitear o hacer rollback de datos inesperadamente.
+**Transaction Boundaries**: Each use case defines its own transactional scope. Calling another use case could commit or roll back data unexpectedly.
 
-**Testabilidad**: Los casos de uso sin dependencias en otros casos de uso son más fáciles de probar en aislamiento.
+**Testability**: Use cases without dependencies on other use cases are easier to test in isolation.
 
-**Claridad**: Cuando ves un caso de uso siendo invocado, sabés que es una operación de nivel superior iniciada por un usuario o sistema externo, no un detalle interno.
-
-**Reusabilidad a Través del Dominio**: La lógica compartida pertenece al dominio (entidades, value objects, servicios de dominio), no en casos de uso. Los casos de uso orquestan; los dominios encapsulan reglas de negocio.
+**Reusability Through Domain**: Shared logic belongs in the domain (entities, value objects, domain services), not in use cases. Use cases orchestrate; domains encapsulate business rules.
 
 ---
 
-## Documentación por Caso de Uso
+## Use Case Documentation
 
-### Dónde Encontrar la Documentación
+### Where to Find Documentation
 
-Cada carpeta de caso de uso contiene un `README.md` con:
-- ID de caso de uso y descripción
-- Actores y stakeholders
-- Precondiciones y postcondiciones
-- Flujo principal y flujos alternativos
-- Reglas de negocio
-- Diagramas de secuencia
-- Escenarios de error
+Each use case folder contains a `README.md` with:
+- Use case ID and description
+- Actors and stakeholders
+- Preconditions and postconditions
+- Main flow and alternative flows
+- Business rules
+- Sequence diagrams
+- Error scenarios
 
-### Estructura de Ejemplo
+### Example Structure
 
 ```markdown
-# UC-CON-001: Crear Contacto
+# UC-BOO-001: Create Book
 
-## Resumen
-Información de descripción y trigger
+## Summary
+Description and trigger information
 
-## Actores
-- Primario: Usuario
-- Secundario: Sistema
+## Actors
+- Primary: API Client
+- Secondary: System
 
-## Precondiciones
-- P1: Usuario autenticado
-- P2: Formato de email válido (si se provee)
+## Preconditions
+- P1: ISBN is not already registered
 
-## Postcondiciones
-- PS1: Contacto persistido
-- PS2: ID devuelto
+## Postconditions
+- PS1: Book persisted in database
+- PS2: ID returned in response
 
-## Flujo Principal
-1. Validar input
-2. Chequear email duplicado
-3. Crear entidad
-4. Persistir
-5. Devolver respuesta
+## Main Flow
+1. Validate input
+2. Check for duplicate ISBN
+3. Create domain entity
+4. Persist
+5. Return response
 
-## Flujos Alternativos
-- FA-1: Email duplicado
-- FA-2: Formato de email inválido
+## Alternative Flows
+- AF-1: Duplicate ISBN → 400 Bad Request
+- AF-2: Invalid input → 400 Bad Request
 
-## Diagrama de Secuencia
+## Sequence Diagram
 ```mermaid
 ...
 ```
 ```
 
-### Accediendo a la Documentación del Caso de Uso
+### Accessing Use Case Documentation
 
-Navegá a cualquier carpeta de caso de uso para encontrar su documentación:
+Navigate to any use case folder to find its documentation:
 
 ```bash
-cd application/use-cases/{dominio}/{acción}-{entidad}/
+cd application/use-cases/{domain}/{action}-{entity}/
 cat README.md
 ```
 
 ---
 
-## Agregando un Nuevo Caso de Uso
+## Adding a New Use Case
 
-1. **Crear carpeta** en el dominio apropiado
-2. **Crear 4 archivos**: caso-de-uso, dto-request, dto-response, interfaz-repository
-3. **Crear README.md** con documentación
-4. **Implementar repository** en la capa de infraestructura
-5. **Registrar en el módulo** de providers
+1. **Create folder** in the appropriate domain
+2. **Create 4 files**: use-case, request-dto, response-dto, repository-interface
+3. **Create README.md** with documentation
+4. **Implement repository** in the infrastructure layer
+5. **Register in the module** providers
 
 ### Checklist
 
-- [ ] Carpeta creada: `application/use-cases/{dominio}/{acción}-{entidad}/`
-- [ ] DTO de request valida el input
-- [ ] DTO de response define la forma de salida
-- [ ] Interfaz de repository definida en la carpeta del caso de uso
-- [ ] Implementación de repository en la capa de infraestructura
-- [ ] README.md con documentación completa
-- [ ] Registrado en el contenedor de inyección de dependencias
+- [ ] Folder created: `application/use-cases/{domain}/{action}-{entity}/`
+- [ ] Request DTO validates input
+- [ ] Response DTO defines output shape
+- [ ] Repository interface defined in the use case folder
+- [ ] Repository implementation in the infrastructure layer
+- [ ] README.md with complete documentation
+- [ ] Registered in the dependency injection container

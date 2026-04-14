@@ -1,135 +1,134 @@
-# Rentadora Autos
+# Books API
 
-Proyecto de ejemplo para demostrar **Clean Architecture** con NestJS y MikroORM.
+Example project demonstrating **Clean Architecture** with NestJS and MikroORM.
 
-## Slides de la Clase
+## Slides
 
-[Ver presentación](https://docs.google.com/presentation/d/1Hf2pUWK4uaJmgrl4XWM30xRTuxq7r3GYMjdX20GJkQc/edit?slide=id.g3d43dd60a97_0_249#slide=id.g3d43dd60a97_0_249)
-[Ver clase](https://www.youtube.com/watch?v=RltjVf7PaPA)
+[View presentation](https://docs.google.com/presentation/d/1Hf2pUWK4uaJmgrl4XWM30xRTuxq7r3GYMjdX20GJkQc/edit?slide=id.g3d43dd60a97_0_249#slide=id.g3d43dd60a97_0_249)
+[View class](https://www.youtube.com/watch?v=RltjVf7PaPA)
 
-## Arquitectura
+## Architecture
 
 ```
 src/
-├── domain/           # Entidades puras (sin decoradores)
-├── application/     # Casos de uso
-├── infrastructure/  # Repositorios, MikroORM
-└── presentation/     # Controladores REST
+├── domain/           # Pure entities (no decorators)
+├── application/     # Use cases
+├── infrastructure/  # Repositories, MikroORM
+└── presentation/    # REST controllers
 ```
 
-### Principios Clave
+### Key Principles
 
-| Regla | Descripción |
-|-------|-------------|
-| **Dominio Puro** | Entidades sin decoradores de framework |
-| **Repository por Operación** | Un repositorio por caso de uso, no uno gordo |
-| **Transacciones** | Siempre usar `transactional()` |
-| **Imports Directos** | Sin barrel files |
+| Rule | Description |
+|------|-------------|
+| **Pure Domain** | Entities without framework decorators |
+| **Repository per Operation** | One repository per use case, not a fat one |
+| **Transactions** | Always use `transactional()` |
+| **Direct Imports** | No barrel files |
 
-## Instalación Local
+## Local Setup
 
-### Requisitos
+### Requirements
 
 - Node.js 18+
-- Docker y Docker Compose
+- Docker and Docker Compose
 - pnpm
 
-### Pasos
+### Steps
 
-1. **Clonar el repositorio**
+1. **Clone the repository**
    ```bash
    git clone <repo-url>
-   cd rentadora-autos
+   cd books-api
    ```
 
-2. **Instalar dependencias**
+2. **Install dependencies**
    ```bash
    pnpm install
    ```
 
-3. **Configurar variables de entorno**
+3. **Configure environment variables**
    ```bash
    cp .env.example .env
-   # Editar .env con tus configuraciones si es necesario
+   # Edit .env with your configuration if needed
    ```
 
-4. **Iniciar la base de datos PostgreSQL con Docker**
+4. **Start PostgreSQL with Docker**
    ```bash
-   # Iniciar el contenedor de PostgreSQL
+   # Start the PostgreSQL container
    pnpm docker:up
 
-   # Verificar que está corriendo
+   # Verify it's running
    pnpm docker:logs
    ```
 
-5. **Compilar y ejecutar la aplicación**
+5. **Build and run the application**
    ```bash
-   # Modo desarrollo (con hot-reload)
+   # Development mode (with hot-reload)
    pnpm start:dev
 
-   # O compilar y ejecutar en modo producción
+   # Or build and run in production mode
    pnpm build
    pnpm start:prod
    ```
 
-6. **Verificar que funciona**
+6. **Verify it works**
    - API: http://localhost:3000
    - Swagger: http://localhost:3000/api
 
-### Comandos Docker
+### Docker Commands
 
 ```bash
-# Iniciar PostgreSQL
+# Start PostgreSQL
 pnpm docker:up
 
-# Detener PostgreSQL
+# Stop PostgreSQL
 pnpm docker:down
 
-# Ver logs
+# View logs
 pnpm docker:logs
 ```
 
-### Variables de Entorno
+### Environment Variables
 
-| Variable | Descripción | Default |
+| Variable | Description | Default |
 |----------|-------------|---------|
-| `DB_HOST` | Host de PostgreSQL | localhost |
-| `DB_PORT` | Puerto de PostgreSQL | 5432 |
-| `DB_USERNAME` | Usuario de PostgreSQL | postgres |
-| `DB_PASSWORD` | Contraseña de PostgreSQL | postgres |
-| `DB_NAME` | Nombre de la base de datos | rentadora_autos |
-| `PORT` | Puerto de la API | 3000 |
-| `NODE_ENV` | Entorno (development/production) | development |
+| `DB_HOST` | PostgreSQL host | localhost |
+| `DB_PORT` | PostgreSQL port | 5432 |
+| `DB_USERNAME` | PostgreSQL user | postgres |
+| `DB_PASSWORD` | PostgreSQL password | postgres |
+| `DB_NAME` | Database name | books |
+| `PORT` | API port | 3000 |
+| `NODE_ENV` | Environment (development/production) | development |
 
-## Comandos Principales
+## Main Commands
 
 ```bash
-# Desarrollo
-pnpm start:dev          # Modo desarrollo (watch)
-pnpm build              # Compilar TypeScript
-pnpm start:prod         # Producción
+# Development
+pnpm start:dev          # Development mode (watch)
+pnpm build              # Compile TypeScript
+pnpm start:prod         # Production
 
 # Testing
-pnpm test               # Tests unitarios
-pnpm test:e2e           # Tests E2E
+pnpm test               # Unit tests
+pnpm test:e2e           # E2E tests
 
 # Docker
-pnpm docker:up          # Iniciar PostgreSQL
-pnpm docker:down        # Detener PostgreSQL
-pnpm docker:logs        # Ver logs de PostgreSQL
+pnpm docker:up          # Start PostgreSQL
+pnpm docker:down        # Stop PostgreSQL
+pnpm docker:logs        # View PostgreSQL logs
 
-# Verificación
-npx tsc --noEmit          # Verificar tipos
-pnpm lint              # Ejecutar linter
+# Verification
+npx tsc --noEmit        # Type check
+pnpm lint               # Run linter
 ```
 
-## Documentación
+## Documentation
 
-- [Índice](./docs/00_INDEX.md)
-- [Arquitectura](./docs/01_ARQUITECTURA.md)
-- [Entidades](./docs/02_ENTIDADES.md)
-- [Casos de Uso](./docs/03_CASOS_DE_USO.md)
+- [Index](./docs/00_INDEX.md)
+- [Architecture](./docs/01_ARCHITECTURE.md)
+- [Entities](./docs/02_ENTITIES.md)
+- [Use Cases](./docs/03_USE_CASES.md)
 - [API](./docs/04_API.md)
-- [Máquina de Estados](./docs/05_MAQUINA_ESTADOS.md)
-- [Excepciones](./docs/06_EXCEPCIONES.md)
 - [Testing](./docs/07_TESTING.md)
+- [Use Case Pattern](./docs/USE_CASE_PATTERN.md)

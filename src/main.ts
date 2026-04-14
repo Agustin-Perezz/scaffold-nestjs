@@ -2,10 +2,10 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AlquilerAutosModule } from './alquiler-autos.module';
+import { BooksModule } from './books.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AlquilerAutosModule);
+  const app = await NestFactory.create(BooksModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -19,12 +19,10 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Rentadora Autos API')
-    .setDescription('API para el sistema de alquiler de autos')
+    .setTitle('Books API')
+    .setDescription('REST API for managing books')
     .setVersion('1.0')
-    .addTag('Autos', 'Operaciones relacionadas con autos')
-    .addTag('Clientes', 'Operaciones relacionadas con clientes')
-    .addTag('Reservas', 'Operaciones relacionadas con reservas')
+    .addTag('Books', 'Book-related operations')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -18,7 +18,8 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f postgres",
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@mikro-orm/core": "^6.2.0",
@@ -34,6 +35,12 @@
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
     "uuid": "^11.1.0"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "pnpm exec prettier --write",
+      "pnpm exec eslint --fix"
+    ]
   },
   "devDependencies": {
     "@mikro-orm/sqlite": "^6.6.12",

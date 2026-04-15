@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Injectable } from '@nestjs/common';
+
+import { IGetBookRepository } from '../../../../../application/use-cases/books/get-book/get-book.repository.interface';
 import { Book } from '../../../../../domain/entities/book.entity';
 import { BookEntity } from '../../entities/book.entity';
-import { IGetBookRepository } from '../../../../../application/use-cases/books/get-book/get-book.repository.interface';
 
 @Injectable()
 export class GetBookRepository implements IGetBookRepository {

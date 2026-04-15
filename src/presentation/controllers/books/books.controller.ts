@@ -10,17 +10,18 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateBookUseCase } from '../../../application/use-cases/books/create-book/create-book.use-case';
-import { GetBookUseCase } from '../../../application/use-cases/books/get-book/get-book.use-case';
-import { ListBooksUseCase } from '../../../application/use-cases/books/list-books/list-books.use-case';
-import { UpdateBookUseCase } from '../../../application/use-cases/books/update-book/update-book.use-case';
-import { DeleteBookUseCase } from '../../../application/use-cases/books/delete-book/delete-book.use-case';
+
 import { CreateBookRequestDto } from '../../../application/use-cases/books/create-book/create-book.request.dto';
-import { UpdateBookRequestDto } from '../../../application/use-cases/books/update-book/update-book.request.dto';
 import { CreateBookResponseDto } from '../../../application/use-cases/books/create-book/create-book.response.dto';
+import { CreateBookUseCase } from '../../../application/use-cases/books/create-book/create-book.use-case';
+import { DeleteBookUseCase } from '../../../application/use-cases/books/delete-book/delete-book.use-case';
 import { GetBookResponseDto } from '../../../application/use-cases/books/get-book/get-book.response.dto';
+import { GetBookUseCase } from '../../../application/use-cases/books/get-book/get-book.use-case';
 import { ListBooksResponseDto } from '../../../application/use-cases/books/list-books/list-books.response.dto';
+import { ListBooksUseCase } from '../../../application/use-cases/books/list-books/list-books.use-case';
+import { UpdateBookRequestDto } from '../../../application/use-cases/books/update-book/update-book.request.dto';
 import { UpdateBookResponseDto } from '../../../application/use-cases/books/update-book/update-book.response.dto';
+import { UpdateBookUseCase } from '../../../application/use-cases/books/update-book/update-book.use-case';
 
 @ApiTags('Books')
 @Controller('books')
@@ -35,7 +36,11 @@ export class BooksController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new book' })
-  @ApiResponse({ status: 201, description: 'Book created successfully', type: CreateBookResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Book created successfully',
+    type: CreateBookResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid data or duplicate ISBN' })
   async create(@Body() dto: CreateBookRequestDto): Promise<CreateBookResponseDto> {
     return this.createBookUseCase.execute(dto);

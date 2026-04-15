@@ -1,5 +1,5 @@
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateBookRequestDto {
   @ApiProperty({ description: 'Book title', example: 'The Pragmatic Programmer' })

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityRepository } from '@mikro-orm/core';
+import { InjectRepository } from '@mikro-orm/nestjs';
+import { Injectable } from '@nestjs/common';
+
+import { IDeleteBookRepository } from '../../../../../application/use-cases/books/delete-book/delete-book.repository.interface';
 import { Book } from '../../../../../domain/entities/book.entity';
 import { BookEntity } from '../../entities/book.entity';
-import { IDeleteBookRepository } from '../../../../../application/use-cases/books/delete-book/delete-book.repository.interface';
 
 @Injectable()
 export class DeleteBookRepository implements IDeleteBookRepository {

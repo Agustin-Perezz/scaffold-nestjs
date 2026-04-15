@@ -32,16 +32,16 @@ classDiagram
 
 ### Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `id` | `string` | Unique UUIDv7 |
-| `title` | `string` | Book title |
-| `author` | `string` | Author name |
-| `isbn` | `string` | ISBN (unique, immutable) |
-| `publicationYear` | `number` | Year of publication (1000–9999) |
-| `genre` | `string \| null` | Genre (optional) |
-| `createdAt` | `Date` | Creation timestamp |
-| `updatedAt` | `Date` | Last modification timestamp |
+| Property          | Type             | Description                     |
+| ----------------- | ---------------- | ------------------------------- |
+| `id`              | `string`         | Unique UUIDv7                   |
+| `title`           | `string`         | Book title                      |
+| `author`          | `string`         | Author name                     |
+| `isbn`            | `string`         | ISBN (unique, immutable)        |
+| `publicationYear` | `number`         | Year of publication (1000–9999) |
+| `genre`           | `string \| null` | Genre (optional)                |
+| `createdAt`       | `Date`           | Creation timestamp              |
+| `updatedAt`       | `Date`           | Last modification timestamp     |
 
 **Note**: `isbn` is immutable after creation.
 

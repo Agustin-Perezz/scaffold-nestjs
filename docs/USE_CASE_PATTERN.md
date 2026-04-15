@@ -25,16 +25,17 @@ This architecture follows **Use Case Isolation** — a strict Clean Architecture
 
 ### Key Principles
 
-| Principle | Description |
-|-----------|-------------|
-| **Single Responsibility** | Each use case does exactly one thing |
-| **Isolation** | No shared repositories between use cases |
-| **Testability** | Each use case can be tested independently |
-| **Discoverability** | Use case documentation lives next to the code |
+| Principle                 | Description                                   |
+| ------------------------- | --------------------------------------------- |
+| **Single Responsibility** | Each use case does exactly one thing          |
+| **Isolation**             | No shared repositories between use cases      |
+| **Testability**           | Each use case can be tested independently     |
+| **Discoverability**       | Use case documentation lives next to the code |
 
 ### Why Documentation Lives with the Code
 
 Co-locating README.md files next to use case implementations ensures:
+
 - **Documentation stays current**: When code changes, the adjacent README is a visible reminder to update documentation
 - **No guessing**: Looking at the folder immediately tells you what is implemented and documented
 - **Code reviews include documentation**: PR reviewers see documentation changes alongside code changes
@@ -62,6 +63,7 @@ application/use-cases/{domain}/{action}-{entity}/
 Fat repositories may seem convenient, but they create significant architectural problems:
 
 **Performance Issues**: Fat repositories encourage cross-use-case reuse, where unrelated operations get grouped. This leads to:
+
 - **Over-fetching**: Loading data that specific use cases don't need
 - **Extra database queries**: Generic methods often require multiple round-trips to satisfy specific use cases
 - **Lock contention**: Broad transactions hold locks longer than necessary
@@ -73,6 +75,7 @@ Fat repositories may seem convenient, but they create significant architectural 
 **Use Cases as Application Services**: Each use case is essentially an Application Service with a single responsibility. Repository per operation keeps service boundaries clean and prevents leaky abstractions.
 
 **❌ NOT Allowed:**
+
 ```typescript
 // Fat repository — couples use cases together
 // If you need to optimize how contacts are listed,
@@ -80,13 +83,14 @@ Fat repositories may seem convenient, but they create significant architectural 
 export interface IContactRepository {
     create(contact: Contact): Promise<Contact>;
     get(id: string): Promise<Contact | null>;
-    list(userId: string): Promise<Contact[]>;        // Generic — often over-fetches
+    list(userId: string): Promise<Contact[]>; // Generic — often over-fetches
     update(contact: Contact): Promise<Contact>;
     delete(id: string): Promise<void>;
 }
 ```
 
 **✅ Correct:**
+
 ```typescript
 // ICreateContactRepository.ts — hyper-specific for this operation
 // Only queries needed for contact creation
@@ -139,13 +143,13 @@ application/use-cases/
 
 Each use case folder contains these files:
 
-| File | Purpose | Example |
-|------|---------|---------|
-| `{name}.use-case.ts` | Core use case logic | `create-book.use-case.ts` |
-| `{name}.request.dto.ts` | Input validation | `create-book.request.dto.ts` |
-| `{name}.response.dto.ts` | Output shape | `create-book.response.dto.ts` |
-| `{name}.repository.interface.ts` | Repository contract | `create-book.repository.interface.ts` |
-| `README.md` | Documentation | See [Use Case Documentation](#use-case-documentation) |
+| File                             | Purpose             | Example                                               |
+| -------------------------------- | ------------------- | ----------------------------------------------------- |
+| `{name}.use-case.ts`             | Core use case logic | `create-book.use-case.ts`                             |
+| `{name}.request.dto.ts`          | Input validation    | `create-book.request.dto.ts`                          |
+| `{name}.response.dto.ts`         | Output shape        | `create-book.response.dto.ts`                         |
+| `{name}.repository.interface.ts` | Repository contract | `create-book.repository.interface.ts`                 |
+| `README.md`                      | Documentation       | See [Use Case Documentation](#use-case-documentation) |
 
 ### Example: Create Book Use Case
 
@@ -157,9 +161,7 @@ import { CreateBookResponseDto } from './create-book.response.dto';
 import { ICreateBookRepository } from './create-book.repository.interface';
 
 export class CreateBookUseCase {
-    constructor(
-        private readonly repository: ICreateBookRepository,
-    ) {}
+    constructor(private readonly repository: ICreateBookRepository) {}
 
     async execute(dto: CreateBookRequestDto): Promise<CreateBookResponseDto> {
         const isbnExists = await this.repository.existsByIsbn(dto.isbn);
@@ -233,7 +235,7 @@ providers: [
     { provide: 'ICreateBookRepository', useClass: CreateBookRepository },
     { provide: 'IGetBookRepository', useClass: GetBookRepository },
     // ... one per use case
-]
+];
 ```
 
 ---
@@ -243,6 +245,7 @@ providers: [
 ### Why Pure Domain Entities?
 
 Domain entities without framework dependencies:
+
 - **Testable without infrastructure**: Run unit tests without a database or any framework
 - **Portable logic**: Business rules can move between frameworks (Express, Fastify, etc.)
 - **Explicit business intent**: Methods like `updateTitle()` express domain concepts, not technical operations
@@ -400,6 +403,7 @@ return {
 ### Why Transactions Are Mandatory
 
 Without explicit transactions:
+
 - **Partial failures**: Database operations may complete partially, leaving data in inconsistent states
 - **Connection leaks**: Uncommitted work holds database connections open longer
 - **Race conditions**: Concurrent operations see intermediate states
@@ -447,7 +451,7 @@ class CreateBookRepository implements ICreateBookRepository {
             author: book.author,
         });
         await this.em.persist(entity).flush();
-        return book;  // Return the domain entity, not the ORM entity
+        return book; // Return the domain entity, not the ORM entity
     }
 }
 ```
@@ -468,7 +472,7 @@ Each use case is a standalone entry point. They never invoke each other directly
 // ❌ WRONG — use cases calling each other
 export class CreateOrderUseCase {
     constructor(
-        private readonly getProductUseCase: GetProductUseCase,  // Don't do this
+        private readonly getProductUseCase: GetProductUseCase, // Don't do this
     ) {}
 }
 ```
@@ -476,14 +480,12 @@ export class CreateOrderUseCase {
 ```typescript
 // ✅ CORRECT — use case orchestrates via repository
 export class CreateOrderUseCase {
-    constructor(
-        private readonly repository: ICreateOrderRepository,
-    ) {}
+    constructor(private readonly repository: ICreateOrderRepository) {}
 
     async execute(request: CreateOrderRequest) {
-        const productIds = request.items.map(item => item.productId);
+        const productIds = request.items.map((item) => item.productId);
         const existenceMap = await this.repository.productsExist(productIds);
-        const missingProducts = productIds.filter(id => !existenceMap[id]);
+        const missingProducts = productIds.filter((id) => !existenceMap[id]);
         if (missingProducts.length > 0) {
             throw new ProductNotFoundError(`Products not found: ${missingProducts.join(', ')}`);
         }
@@ -509,6 +511,7 @@ export class CreateOrderUseCase {
 ### Where to Find Documentation
 
 Each use case folder contains a `README.md` with:
+
 - Use case ID and description
 - Actors and stakeholders
 - Preconditions and postconditions
@@ -519,24 +522,29 @@ Each use case folder contains a `README.md` with:
 
 ### Example Structure
 
-```markdown
+````markdown
 # UC-BOO-001: Create Book
 
 ## Summary
+
 Description and trigger information
 
 ## Actors
+
 - Primary: API Client
 - Secondary: System
 
 ## Preconditions
+
 - P1: ISBN is not already registered
 
 ## Postconditions
+
 - PS1: Book persisted in database
 - PS2: ID returned in response
 
 ## Main Flow
+
 1. Validate input
 2. Check for duplicate ISBN
 3. Create domain entity
@@ -544,14 +552,18 @@ Description and trigger information
 5. Return response
 
 ## Alternative Flows
+
 - AF-1: Duplicate ISBN → 400 Bad Request
 - AF-2: Invalid input → 400 Bad Request
 
 ## Sequence Diagram
+
 ```mermaid
 ...
 ```
-```
+````
+
+````
 
 ### Accessing Use Case Documentation
 
@@ -560,7 +572,7 @@ Navigate to any use case folder to find its documentation:
 ```bash
 cd application/use-cases/{domain}/{action}-{entity}/
 cat README.md
-```
+````
 
 ---
 

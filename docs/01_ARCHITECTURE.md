@@ -30,11 +30,11 @@ graph TB
 
 ### 1. Separation of Concerns
 
-| Layer | Responsibility | Example |
-|-------|---------------|---------|
-| **Presentation** | HTTP, DTOs, Swagger | Controllers |
-| **Application** | Business logic, Orchestration | Use Cases |
-| **Domain** | Pure entities, Business rules | Book |
+| Layer              | Responsibility                 | Example                |
+| ------------------ | ------------------------------ | ---------------------- |
+| **Presentation**   | HTTP, DTOs, Swagger            | Controllers            |
+| **Application**    | Business logic, Orchestration  | Use Cases              |
+| **Domain**         | Pure entities, Business rules  | Book                   |
 | **Infrastructure** | Persistence, External services | Repositories, MikroORM |
 
 ### 2. Folder Structure
@@ -175,7 +175,7 @@ providers: [
     },
     CreateBookUseCase,
     // ...
-]
+];
 ```
 
 ## MikroORM Configuration

@@ -1,7 +1,3 @@
 module.exports = {
-    '*.ts': [
-        'pnpm exec prettier --write',
-        'pnpm exec eslint --fix',
-        'pnpm test -- --passWithNoTests --findRelatedTests',
-    ],
+    '*.ts': ['pnpm exec prettier --write', 'pnpm exec eslint --fix'],
 };

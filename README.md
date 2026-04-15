@@ -19,12 +19,12 @@ src/
 
 ### Key Principles
 
-| Rule | Description |
-|------|-------------|
-| **Pure Domain** | Entities without framework decorators |
+| Rule                         | Description                                |
+| ---------------------------- | ------------------------------------------ |
+| **Pure Domain**              | Entities without framework decorators      |
 | **Repository per Operation** | One repository per use case, not a fat one |
-| **Transactions** | Always use `transactional()` |
-| **Direct Imports** | No barrel files |
+| **Transactions**             | Always use `transactional()`               |
+| **Direct Imports**           | No barrel files                            |
 
 ## Local Setup
 
@@ -37,44 +37,49 @@ src/
 ### Steps
 
 1. **Clone the repository**
-   ```bash
-   git clone <repo-url>
-   cd books-api
-   ```
+
+    ```bash
+    git clone <repo-url>
+    cd books-api
+    ```
 
 2. **Install dependencies**
-   ```bash
-   pnpm install
-   ```
+
+    ```bash
+    pnpm install
+    ```
 
 3. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration if needed
-   ```
+
+    ```bash
+    cp .env.example .env
+    # Edit .env with your configuration if needed
+    ```
 
 4. **Start PostgreSQL with Docker**
-   ```bash
-   # Start the PostgreSQL container
-   pnpm docker:up
 
-   # Verify it's running
-   pnpm docker:logs
-   ```
+    ```bash
+    # Start the PostgreSQL container
+    pnpm docker:up
+
+    # Verify it's running
+    pnpm docker:logs
+    ```
 
 5. **Build and run the application**
-   ```bash
-   # Development mode (with hot-reload)
-   pnpm start:dev
 
-   # Or build and run in production mode
-   pnpm build
-   pnpm start:prod
-   ```
+    ```bash
+    # Development mode (with hot-reload)
+    pnpm start:dev
+
+    # Or build and run in production mode
+    pnpm build
+    pnpm start:prod
+    ```
 
 6. **Verify it works**
-   - API: http://localhost:3000
-   - Swagger: http://localhost:3000/api
+    - API: http://localhost:3000
+    - Swagger: http://localhost:3000/api
 
 ### Docker Commands
 
@@ -91,15 +96,15 @@ pnpm docker:logs
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DB_HOST` | PostgreSQL host | localhost |
-| `DB_PORT` | PostgreSQL port | 5432 |
-| `DB_USERNAME` | PostgreSQL user | postgres |
-| `DB_PASSWORD` | PostgreSQL password | postgres |
-| `DB_NAME` | Database name | books |
-| `PORT` | API port | 3000 |
-| `NODE_ENV` | Environment (development/production) | development |
+| Variable      | Description                          | Default     |
+| ------------- | ------------------------------------ | ----------- |
+| `DB_HOST`     | PostgreSQL host                      | localhost   |
+| `DB_PORT`     | PostgreSQL port                      | 5432        |
+| `DB_USERNAME` | PostgreSQL user                      | postgres    |
+| `DB_PASSWORD` | PostgreSQL password                  | postgres    |
+| `DB_NAME`     | Database name                        | books       |
+| `PORT`        | API port                             | 3000        |
+| `NODE_ENV`    | Environment (development/production) | development |
 
 ## Main Commands
 

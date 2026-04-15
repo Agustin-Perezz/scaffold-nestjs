@@ -30,23 +30,26 @@ graph TB
 
 ```javascript
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  rootDir: '..',
-  testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: '<rootDir>/coverage',
-  moduleNameMapper: {
-    '^src/(.*)$': '<rootDir>/src/$1',
-    '^uuid$': '<rootDir>/node_modules/uuid/dist/cjs/index.js',
-  },
-  transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: '<rootDir>/tsconfig.json',
-      isolatedModules: true,
-    }],
-  },
+    preset: 'ts-jest',
+    testEnvironment: 'node',
+    rootDir: '..',
+    testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
+    collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+    coverageDirectory: '<rootDir>/coverage',
+    moduleNameMapper: {
+        '^src/(.*)$': '<rootDir>/src/$1',
+        '^uuid$': '<rootDir>/node_modules/uuid/dist/cjs/index.js',
+    },
+    transform: {
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                tsconfig: '<rootDir>/tsconfig.json',
+                isolatedModules: true,
+            },
+        ],
+    },
 };
 ```
 
@@ -117,7 +120,9 @@ describe('Books Controller (e2e)', () => {
     let app: INestApplication;
     let bookId: string;
 
-    beforeAll(async () => { /* setup */ });
+    beforeAll(async () => {
+        /* setup */
+    });
 
     describe('/books (POST)', () => {
         it('should create a book', () => {
@@ -174,9 +179,7 @@ describe('Books Controller (e2e)', () => {
         });
 
         it('should return 404 for unknown ID', () => {
-            return request(app.getHttpServer())
-                .get('/books/non-existent-id')
-                .expect(404);
+            return request(app.getHttpServer()).get('/books/non-existent-id').expect(404);
         });
     });
 
@@ -194,9 +197,7 @@ describe('Books Controller (e2e)', () => {
 
     describe('/books/:id (DELETE)', () => {
         it('should delete a book', () => {
-            return request(app.getHttpServer())
-                .delete(`/books/${bookId}`)
-                .expect(204);
+            return request(app.getHttpServer()).delete(`/books/${bookId}`).expect(204);
         });
     });
 });

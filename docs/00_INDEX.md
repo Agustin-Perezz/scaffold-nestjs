@@ -4,15 +4,15 @@
 
 ## Table of Contents
 
-| # | Document | Description |
-|---|----------|-------------|
-| 00 | [INDEX](00_INDEX.md) | This file - general index |
-| 01 | [ARCHITECTURE](01_ARCHITECTURE.md) | Clean Architecture overview |
-| 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Book) |
-| 03 | [USE_CASES](03_USE_CASES.md) | Complete use case catalog |
-| 04 | [API](04_API.md) | REST endpoints and Swagger documentation |
-| 07 | [TESTING](07_TESTING.md) | E2E testing guide |
-| — | [USE_CASE_PATTERN](USE_CASE_PATTERN.md) | Use case isolation pattern guide |
+| #   | Document                                | Description                              |
+| --- | --------------------------------------- | ---------------------------------------- |
+| 00  | [INDEX](00_INDEX.md)                    | This file - general index                |
+| 01  | [ARCHITECTURE](01_ARCHITECTURE.md)      | Clean Architecture overview              |
+| 02  | [ENTITIES](02_ENTITIES.md)              | Domain entities (Book)                   |
+| 03  | [USE_CASES](03_USE_CASES.md)            | Complete use case catalog                |
+| 04  | [API](04_API.md)                        | REST endpoints and Swagger documentation |
+| 07  | [TESTING](07_TESTING.md)                | E2E testing guide                        |
+| —   | [USE_CASE_PATTERN](USE_CASE_PATTERN.md) | Use case isolation pattern guide         |
 
 ---
 
@@ -64,10 +64,10 @@ npx tsc --noEmit        # Type check
 
 ## Important URLs
 
-| Service | URL |
-|---------|-----|
-| API | http://localhost:3000 |
-| Swagger | http://localhost:3000/api |
+| Service  | URL                                 |
+| -------- | ----------------------------------- |
+| API      | http://localhost:3000               |
+| Swagger  | http://localhost:3000/api           |
 | Database | PostgreSQL (see docker-compose.yml) |
 
 ---

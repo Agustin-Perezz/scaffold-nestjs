@@ -2,12 +2,12 @@
 
 ## Use Case Catalog
 
-| ID | Use Case | Method | Endpoint |
-|----|----------|--------|----------|
-| UC-BOO-001 | Create Book | POST | `/books` |
-| UC-BOO-002 | Get Book | GET | `/books/:id` |
-| UC-BOO-003 | List Books | GET | `/books` |
-| UC-BOO-004 | Update Book | PUT | `/books/:id` |
+| ID         | Use Case    | Method | Endpoint     |
+| ---------- | ----------- | ------ | ------------ |
+| UC-BOO-001 | Create Book | POST   | `/books`     |
+| UC-BOO-002 | Get Book    | GET    | `/books/:id` |
+| UC-BOO-003 | List Books  | GET    | `/books`     |
+| UC-BOO-004 | Update Book | PUT    | `/books/:id` |
 | UC-BOO-005 | Delete Book | DELETE | `/books/:id` |
 
 ---
@@ -51,10 +51,10 @@ export class CreateBookRequestDto {
 
 ### Error Cases
 
-| Condition | Exception |
-|-----------|-----------|
+| Condition      | Exception                   |
+| -------------- | --------------------------- |
 | Duplicate ISBN | `BadRequestException` (400) |
-| Invalid input | `BadRequestException` (400) |
+| Invalid input  | `BadRequestException` (400) |
 
 ---
 
@@ -68,8 +68,8 @@ export class CreateBookRequestDto {
 
 ### Error Cases
 
-| Condition | Exception |
-|-----------|-----------|
+| Condition      | Exception                 |
+| -------------- | ------------------------- |
 | Book not found | `NotFoundException` (404) |
 
 ---
@@ -124,10 +124,10 @@ export class UpdateBookRequestDto {
 
 ### Error Cases
 
-| Condition | Exception |
-|-----------|-----------|
-| Book not found | `NotFoundException` (404) |
-| Invalid input | `BadRequestException` (400) |
+| Condition      | Exception                   |
+| -------------- | --------------------------- |
+| Book not found | `NotFoundException` (404)   |
+| Invalid input  | `BadRequestException` (400) |
 
 ---
 
@@ -142,6 +142,6 @@ export class UpdateBookRequestDto {
 
 ### Error Cases
 
-| Condition | Exception |
-|-----------|-----------|
+| Condition      | Exception                 |
+| -------------- | ------------------------- |
 | Book not found | `NotFoundException` (404) |

@@ -3,35 +3,35 @@ import { v7 as uuidv7 } from 'uuid';
 
 @Entity({ tableName: 'books' })
 export class BookEntity {
-  @PrimaryKey()
-  id: string = uuidv7();
+    @PrimaryKey()
+    id: string = uuidv7();
 
-  @Index()
-  @Property()
-  title: string;
+    @Index()
+    @Property()
+    title: string;
 
-  @Property()
-  author: string;
+    @Property()
+    author: string;
 
-  @Property({ unique: true })
-  isbn: string;
+    @Property({ unique: true })
+    isbn: string;
 
-  @Property()
-  publicationYear: number;
+    @Property()
+    publicationYear: number;
 
-  @Property({ nullable: true })
-  genre: string | null = null;
+    @Property({ nullable: true })
+    genre: string | null = null;
 
-  @Property()
-  createdAt: Date = new Date();
+    @Property()
+    createdAt: Date = new Date();
 
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date = new Date();
+    @Property({ onUpdate: () => new Date() })
+    updatedAt: Date = new Date();
 
-  constructor(title: string, author: string, isbn: string, publicationYear: number) {
-    this.title = title;
-    this.author = author;
-    this.isbn = isbn;
-    this.publicationYear = publicationYear;
-  }
+    constructor(title: string, author: string, isbn: string, publicationYear: number) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.publicationYear = publicationYear;
+    }
 }

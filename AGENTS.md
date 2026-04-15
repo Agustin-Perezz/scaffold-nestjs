@@ -5,6 +5,7 @@
 ## Introducción
 
 Este proyecto fue construido completamente con asistencia de IA. Este documento explica:
+
 1. La estructura del proyecto
 2. Cómo se usó la IA durante el desarrollo
 3. Cómo continuar trabajando con IA en este proyecto
@@ -85,31 +86,31 @@ rentadora-autos/
 Este proyecto fue desarrollado usando Claude Code con el siguiente flujo de trabajo:
 
 1. **Fase de Planificación**
-   - La IA analizó los requerimientos
-   - Generó propuestas de arquitectura
-   - Creó documentación primero
+    - La IA analizó los requerimientos
+    - Generó propuestas de arquitectura
+    - Creó documentación primero
 
 2. **Fase de Implementación**
-   - La IA generó código basado en la arquitectura
-   - Desarrollo incremental de features
-   - Actualización continua de documentación
+    - La IA generó código basado en la arquitectura
+    - Desarrollo incremental de features
+    - Actualización continua de documentación
 
 3. **Fase de Revisión**
-   - La IA revisó el código por consistencia
-   - Verificó cumplimiento arquitectural
-   - Generó casos de prueba
+    - La IA revisó el código por consistencia
+    - Verificó cumplimiento arquitectural
+    - Generó casos de prueba
 
 ### Componentes Generados por IA
 
-| Componente | Generado por IA | Notas |
-|------------|-----------------|-------|
-| Entidades de Dominio | ✅ 100% | TypeScript puro con factory methods |
-| Casos de Uso | ✅ 100% | Patrón por operación |
-| Repositorios | ✅ 100% | Patrón por caso de uso |
-| Entidades MikroORM | ✅ 100% | Con decoradores |
-| Controladores | ✅ 100% | Con Swagger |
-| DTOs | ✅ 100% | Con class-validator |
-| Documentación | ✅ 100% | Este archivo |
+| Componente           | Generado por IA | Notas                               |
+| -------------------- | --------------- | ----------------------------------- |
+| Entidades de Dominio | ✅ 100%         | TypeScript puro con factory methods |
+| Casos de Uso         | ✅ 100%         | Patrón por operación                |
+| Repositorios         | ✅ 100%         | Patrón por caso de uso              |
+| Entidades MikroORM   | ✅ 100%         | Con decoradores                     |
+| Controladores        | ✅ 100%         | Con Swagger                         |
+| DTOs                 | ✅ 100%         | Con class-validator                 |
+| Documentación        | ✅ 100%         | Este archivo                        |
 
 ---
 
@@ -118,18 +119,20 @@ Este proyecto fue desarrollado usando Claude Code con el siguiente flujo de trab
 ### Empezando
 
 1. **Leer AGENTS.md Primero**
-   ```bash
-   cat AGENTS.md
-   ```
-   Este archivo contiene restricciones críticas y patrones.
+
+    ```bash
+    cat AGENTS.md
+    ```
+
+    Este archivo contiene restricciones críticas y patrones.
 
 2. **Leer Documentación Relevante**
-   - Revisar ADR-0001 a ADR-0009 en chepibe/docs/adr/
+    - Revisar ADR-0001 a ADR-0009 en chepibe/docs/adr/
 
 3. **Entender la Arquitectura**
-   - Clean Architecture con 4 capas
-   - Repositorio por caso de uso
-   - Transacciones obligatorias con MikroORM
+    - Clean Architecture con 4 capas
+    - Repositorio por caso de uso
+    - Transacciones obligatorias con MikroORM
 
 ### Agregando Nuevas Features
 
@@ -233,6 +236,7 @@ export class [Dominio]Controller {
 ### 1. Siempre Referenciar AGENTS.md
 
 Las restricciones en AGENTS.md son críticas:
+
 - No crear repositorios "gordos"
 - No crear archivos barrel
 - No contaminar el dominio con decorators
@@ -242,6 +246,7 @@ Las restricciones en AGENTS.md son críticas:
 ### 2. Documentar Primero, Codificar Después
 
 Antes de implementar, documentar:
+
 - Agregar caso de uso a USE_CASES.md
 - Actualizar entidades en DOMAIN_ENTITIES.md
 - Crear ADR si hay decisión arquitectural
@@ -278,7 +283,7 @@ export class Auto {
 }
 
 // INCORRECTO
-@Entity()  // ❌ No en dominio
+@Entity() // ❌ No en dominio
 export class Auto {}
 ```
 
@@ -286,11 +291,12 @@ export class Auto {}
 
 ```typescript
 // CORRECTO
-export interface ICrearAutoRepository { }
-export interface IObtenerAutoRepository { }
+export interface ICrearAutoRepository {}
+export interface IObtenerAutoRepository {}
 
 // INCORRECTO
-export interface IAutoRepository {  // ❌ Repositorio gordo
+export interface IAutoRepository {
+    // ❌ Repositorio gordo
     crear();
     obtener();
     listar();
@@ -348,16 +354,19 @@ npx tsc --noEmit         # Verificar tipos
 ## Recursos
 
 ### Documentación
+
 - `AGENTS.md` - Restricciones y patrones de IA
 - Documentación de chepibe/docs/ - Arquitectura completa
 
 ### Ubicaciones de Código
+
 - `src/domain/entities/` - Entidades de dominio
 - `src/application/use-cases/` - Casos de uso
 - `src/infrastructure/` - Servicios externos y repositorios
 - `src/presentation/` - Controladores
 
 ### Comandos
+
 ```bash
 # Desarrollo
 npm run start            # Iniciar
@@ -382,6 +391,6 @@ npx tsc --noEmit         # Verificar tipos
 
 ---
 
-*Este proyecto es un testimonio del desarrollo asistido por IA. La combinación de Clean Architecture, documentación comprehensiva, y herramientas de IA permite desarrollo rápido y mantenible.*
+_Este proyecto es un testimonio del desarrollo asistido por IA. La combinación de Clean Architecture, documentación comprehensiva, y herramientas de IA permite desarrollo rápido y mantenible._
 
-*Última Actualización: Abril 2026*
+_Última Actualización: Abril 2026_

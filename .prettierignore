@@ -1,0 +1,6 @@
+# Ignore everything except src
+/*
+!src/
+node_modules/
+dist/
+.git/

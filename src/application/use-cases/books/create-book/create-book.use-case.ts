@@ -1,8 +1,9 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Book } from '../../../../domain/entities/book.entity';
+
 import { ICreateBookRepository } from './create-book.repository.interface';
 import { CreateBookRequestDto } from './create-book.request.dto';
 import { CreateBookResponseDto } from './create-book.response.dto';
+import { Book } from '../../../../domain/entities/book.entity';
 
 @Injectable()
 export class CreateBookUseCase {

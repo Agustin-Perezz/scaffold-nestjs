@@ -1,4 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+
 import { IGetBookRepository } from './get-book.repository.interface';
 import { GetBookResponseDto } from './get-book.response.dto';
 

@@ -1,38 +1,40 @@
-# Cómo Usar Este Proyecto con IA
+# How to Use This Project with AI
 
-> Guía para entender la estructura de Rentadora Autos y cómo se usa la IA en el desarrollo
+> This project is a clone of [r-argentina-programa/arquitectura](https://github.com/r-argentina-programa/arquitectura/tree/main).
 
-## Introducción
+> Guide for understanding the structure of this project and how AI is used in development
 
-Este proyecto fue construido completamente con asistencia de IA. Este documento explica:
-1. La estructura del proyecto
-2. Cómo se usó la IA durante el desarrollo
-3. Cómo continuar trabajando con IA en este proyecto
-4. Mejores prácticas para desarrollo asistido por IA
+## Introduction
+
+This project was built entirely with AI assistance. This document explains:
+1. The project structure
+2. How AI was used during development
+3. How to continue working with AI in this project
+4. Best practices for AI-assisted development
 
 ---
 
-## Estructura del Proyecto
+## Project Structure
 
-### Layout del Proyecto
+### Project Layout
 
 ```
-rentadora-autos/
+scaffold-nestjs/
 ├── src/
 │   ├── domain/
-│   │   └── entities/           # Entidades puras de dominio
+│   │   └── entities/           # Pure domain entities
 │   ├── application/
-│   │   └── use-cases/         # Casos de uso
-│   │       ├── autos/         # Caso de uso de autos
-│   │       ├── clientes/      # Caso de uso de clientes
-│   │       └── reservas/      # Caso de uso de reservas
+│   │   └── use-cases/         # Use cases
+│   │       ├── autos/         # Auto use cases
+│   │       ├── clientes/      # Client use cases
+│   │       └── reservas/      # Reservation use cases
 │   ├── infrastructure/
 │   │   ├── database/
-│   │   │   ├── entities/     # Entidades MikroORM
-│   │   │   └── repositories/ # Implementaciones de repositorio
-│   │   └── config/           # Configuración
+│   │   │   ├── entities/     # MikroORM entities
+│   │   │   └── repositories/ # Repository implementations
+│   │   └── config/           # Configuration
 │   └── presentation/
-│       └── controllers/       # Controladores REST
+│       └── controllers/       # REST controllers
 ├── package.json
 ├── tsconfig.json
 └── nest-cli.json
@@ -42,7 +44,7 @@ rentadora-autos/
 
 ## Clean Architecture
 
-### Estructura de Capas
+### Layer Structure
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -59,329 +61,329 @@ rentadora-autos/
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Domain Layer                              │
-│           (Entidades Puras - SIN Decoradores de Framework)      │
+│           (Pure Entities - NO Framework Decorators)             │
 └─────────────────────────────────────────────────────────────────┘
                                ▲
                                │
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Infrastructure Layer                          │
-│    (Implementaciones de Repositorio, MikroORM, Servicios)       │
+│    (Repository Implementations, MikroORM, Services)             │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Reglas Clave
+### Key Rules
 
-1. **Domain Layer** - Sin decoradores de framework, TypeScript puro
-2. **Application Layer** - Casos de uso con interfaces de repositorio
-3. **Infrastructure Layer** - Implementaciones de repositorio, servicios externos
-4. **Presentation Layer** - Controladores, validación, Swagger
-
----
-
-## Cómo se Usó la IA
-
-### Enfoque de Desarrollo
-
-Este proyecto fue desarrollado usando Claude Code con el siguiente flujo de trabajo:
-
-1. **Fase de Planificación**
-   - La IA analizó los requerimientos
-   - Generó propuestas de arquitectura
-   - Creó documentación primero
-
-2. **Fase de Implementación**
-   - La IA generó código basado en la arquitectura
-   - Desarrollo incremental de features
-   - Actualización continua de documentación
-
-3. **Fase de Revisión**
-   - La IA revisó el código por consistencia
-   - Verificó cumplimiento arquitectural
-   - Generó casos de prueba
-
-### Componentes Generados por IA
-
-| Componente | Generado por IA | Notas |
-|------------|-----------------|-------|
-| Entidades de Dominio | ✅ 100% | TypeScript puro con factory methods |
-| Casos de Uso | ✅ 100% | Patrón por operación |
-| Repositorios | ✅ 100% | Patrón por caso de uso |
-| Entidades MikroORM | ✅ 100% | Con decoradores |
-| Controladores | ✅ 100% | Con Swagger |
-| DTOs | ✅ 100% | Con class-validator |
-| Documentación | ✅ 100% | Este archivo |
+1. **Domain Layer** - No framework decorators, pure TypeScript
+2. **Application Layer** - Use cases with repository interfaces
+3. **Infrastructure Layer** - Repository implementations, external services
+4. **Presentation Layer** - Controllers, validation, Swagger
 
 ---
 
-## Trabajando con IA en Este Proyecto
+## How AI Was Used
 
-### Empezando
+### Development Approach
 
-1. **Leer AGENTS.md Primero**
+This project was developed using Claude Code with the following workflow:
+
+1. **Planning Phase**
+   - AI analyzed the requirements
+   - Generated architecture proposals
+   - Created documentation first
+
+2. **Implementation Phase**
+   - AI generated code based on the architecture
+   - Incremental feature development
+   - Continuous documentation updates
+
+3. **Review Phase**
+   - AI reviewed code for consistency
+   - Verified architectural compliance
+   - Generated test cases
+
+### AI-Generated Components
+
+| Component | AI Generated | Notes |
+|-----------|--------------|-------|
+| Domain Entities | ✅ 100% | Pure TypeScript with factory methods |
+| Use Cases | ✅ 100% | One per operation pattern |
+| Repositories | ✅ 100% | One per use case pattern |
+| MikroORM Entities | ✅ 100% | With decorators |
+| Controllers | ✅ 100% | With Swagger |
+| DTOs | ✅ 100% | With class-validator |
+| Documentation | ✅ 100% | This file |
+
+---
+
+## Working with AI in This Project
+
+### Getting Started
+
+1. **Read AGENTS.md First**
    ```bash
    cat AGENTS.md
    ```
-   Este archivo contiene restricciones críticas y patrones.
+   This file contains critical constraints and patterns.
 
-2. **Leer Documentación Relevante**
-   - Revisar ADR-0001 a ADR-0009 en chepibe/docs/adr/
+2. **Read Relevant Documentation**
+   - Review ADR-0001 to ADR-0009 in docs/adr/
 
-3. **Entender la Arquitectura**
-   - Clean Architecture con 4 capas
-   - Repositorio por caso de uso
-   - Transacciones obligatorias con MikroORM
+3. **Understand the Architecture**
+   - Clean Architecture with 4 layers
+   - One repository per use case
+   - Mandatory transactions with MikroORM
 
-### Agregando Nuevas Features
+### Adding New Features
 
-#### Paso 1: Entidad de Dominio
+#### Step 1: Domain Entity
 
 ```typescript
-// src/domain/entities/[entidad].entity.ts
-export class [Entidad] {
+// src/domain/entities/[entity].entity.ts
+export class [Entity] {
     private readonly _id: string;
-    // ... otras propiedades privadas
+    // ... other private properties
 
-    static create(props: { ... }): [Entidad] {
-        return new [Entidad](uuidv7(), ...);
+    static create(props: { ... }): [Entity] {
+        return new [Entity](uuidv7(), ...);
     }
 
-    static reconstruct(props: { ... }): [Entidad] {
-        return new [Entidad](...);
+    static reconstruct(props: { ... }): [Entity] {
+        return new [Entity](...);
     }
 
-    // Métodos de dominio
+    // Domain methods
 }
 ```
 
-#### Paso 2: Caso de Uso
+#### Step 2: Use Case
 
 ```typescript
-// src/application/use-cases/[dominio]/[accion]-[entidad]/
-// [accion]-[entidad].use-case.ts
+// src/application/use-cases/[domain]/[action]-[entity]/
+// [action]-[entity].use-case.ts
 @Injectable()
-export class [Accion][Entidad]UseCase {
+export class [Action][Entity]UseCase {
     constructor(
-        @Inject('I[Accion][Entidad]Repository')
-        private readonly repository: I[Accion][Entidad]Repository,
+        @Inject('I[Action][Entity]Repository')
+        private readonly repository: I[Action][Entity]Repository,
     ) {}
 
-    async execute(request: [Accion][Entidad]RequestDto): Promise<[Accion][Entidad]ResponseDto> {
-        // Implementación
+    async execute(request: [Action][Entity]RequestDto): Promise<[Action][Entity]ResponseDto> {
+        // Implementation
     }
 }
 
-// [accion]-[entidad].repository.interface.ts
-export interface I[Accion][Entidad]Repository {
-    [accion](entidad: [Entidad]): Promise<[Entidad]>;
+// [action]-[entity].repository.interface.ts
+export interface I[Action][Entity]Repository {
+    [action](entity: [Entity]): Promise<[Entity]>;
 }
 ```
 
-#### Paso 3: Implementación del Repositorio
+#### Step 3: Repository Implementation
 
 ```typescript
-// src/infrastructure/database/repositories/[dominio]/[accion]-[entidad].repository.ts
+// src/infrastructure/database/repositories/[domain]/[action]-[entity].repository.ts
 @Injectable()
-export class [Accion][Entidad]Repository implements I[Accion][Entidad]Repository {
+export class [Action][Entity]Repository implements I[Action][Entity]Repository {
     constructor(
-        @InjectRepository([Entidad]Entity)
-        private readonly repository: EntityRepository<[Entidad]Entity>,
+        @InjectRepository([Entity]Entity)
+        private readonly repository: EntityRepository<[Entity]Entity>,
         private readonly orm: MikroORM,
     ) {}
 
-    async [accion](entidad: [Entidad]): Promise<[Entidad]> {
+    async [action](entity: [Entity]): Promise<[Entity]> {
         return this.orm.em.transactional(async (em) => {
-            // Implementación
+            // Implementation
         });
     }
 }
 ```
 
-#### Paso 4: Registro en Módulo
+#### Step 4: Register in Module
 
 ```typescript
-// src/rentadora-autos.module.ts
+// src/app.module.ts
 providers: [
     {
-        provide: 'I[Accion][Entidad]Repository',
-        useClass: [Accion][Entidad]Repository,
+        provide: 'I[Action][Entity]Repository',
+        useClass: [Action][Entity]Repository,
     },
 ]
 ```
 
-#### Paso 5: Controlador
+#### Step 5: Controller
 
 ```typescript
-// src/presentation/controllers/[dominio]/
-@ApiTags('[dominio]')
-@Controller('[dominio]')
-export class [Dominio]Controller {
+// src/presentation/controllers/[domain]/
+@ApiTags('[domain]')
+@Controller('[domain]')
+export class [Domain]Controller {
     constructor(
-        private readonly [accion][Entidad]UseCase: [Accion][Entidad]UseCase,
+        private readonly [action][Entity]UseCase: [Action][Entity]UseCase,
     ) {}
 
     @Post()
-    async [accion](@Body() dto: [Accion][Entidad]RequestDto) {
-        return this.[accion][Entidad]UseCase.execute(dto);
+    async [action](@Body() dto: [Action][Entity]RequestDto) {
+        return this.[action][Entity]UseCase.execute(dto);
     }
 }
 ```
 
 ---
 
-## Patrones de IA
+## AI Patterns
 
-### 1. Siempre Referenciar AGENTS.md
+### 1. Always Reference AGENTS.md
 
-Las restricciones en AGENTS.md son críticas:
-- No crear repositorios "gordos"
-- No crear archivos barrel
-- No contaminar el dominio con decorators
-- Usar transacciones siempre
-- UUIDv7 para IDs
+The constraints in AGENTS.md are critical:
+- Do not create "fat" repositories
+- Do not create barrel files
+- Do not pollute the domain with decorators
+- Always use transactions
+- UUIDv7 for IDs
 
-### 2. Documentar Primero, Codificar Después
+### 2. Document First, Code After
 
-Antes de implementar, documentar:
-- Agregar caso de uso a USE_CASES.md
-- Actualizar entidades en DOMAIN_ENTITIES.md
-- Crear ADR si hay decisión arquitectural
+Before implementing, document:
+- Add use case to USE_CASES.md
+- Update entities in DOMAIN_ENTITIES.md
+- Create an ADR if there is an architectural decision
 
-### 3. Verificar Incrementablemente
+### 3. Verify Incrementally
 
 ```bash
-# Verificar tipos
+# Check types
 npx tsc --noEmit
 
-# Verificar lint
+# Check lint
 npm run lint
 
-# Verificar compilación
+# Check build
 npm run build
 ```
 
-### 4. Usar Imports Directos
+### 4. Use Direct Imports
 
 ```typescript
-// CORRECTO
+// CORRECT
 import { Auto } from '../../../../domain/entities/auto.entity';
 
-// INCORRECTO - No usar barrel files
+// INCORRECT - Do not use barrel files
 import { Entities } from '../../domain';
 ```
 
-### 5. Mantener el Dominio Puro
+### 5. Keep the Domain Pure
 
 ```typescript
-// CORRECTO - Sin decoradores
+// CORRECT - No decorators
 export class Auto {
     private readonly _id: string;
 }
 
-// INCORRECTO
-@Entity()  // ❌ No en dominio
+// INCORRECT
+@Entity()  // ❌ Not in domain
 export class Auto {}
 ```
 
-### 6. Repositorio Por Operación
+### 6. One Repository Per Operation
 
 ```typescript
-// CORRECTO
-export interface ICrearAutoRepository { }
-export interface IObtenerAutoRepository { }
+// CORRECT
+export interface ICreateAutoRepository { }
+export interface IGetAutoRepository { }
 
-// INCORRECTO
-export interface IAutoRepository {  // ❌ Repositorio gordo
-    crear();
-    obtener();
-    listar();
-    actualizar();
-    eliminar();
+// INCORRECT
+export interface IAutoRepository {  // ❌ Fat repository
+    create();
+    get();
+    list();
+    update();
+    delete();
 }
 ```
 
-### 7. Usar Transacciones
+### 7. Always Use Transactions
 
 ```typescript
-// CORRECTO
+// CORRECT
 return this.orm.em.transactional(async (em) => {
     await em.persist(entity).flush();
 });
 
-// INCORRECTO
+// INCORRECT
 await this.repository.getEntityManager().persist(entity).flush();
 ```
 
 ---
 
-## Tareas Comunes
+## Common Tasks
 
-### Agregar un Nuevo Dominio
+### Adding a New Domain
 
-1. Crear entidad en `domain/entities/`
-2. Crear entidad MikroORM en `infrastructure/database/entities/`
-3. Crear casos de uso en `application/use-cases/[dominio]/`
-4. Crear repositorios en `infrastructure/database/repositories/[dominio]/`
-5. Crear controlador en `presentation/controllers/[dominio]/`
-6. Actualizar `RentadoraAutosModule` con repositorios
-7. Actualizar `RentadoraAutosModule` con casos de uso
+1. Create entity in `domain/entities/`
+2. Create MikroORM entity in `infrastructure/database/entities/`
+3. Create use cases in `application/use-cases/[domain]/`
+4. Create repositories in `infrastructure/database/repositories/[domain]/`
+5. Create controller in `presentation/controllers/[domain]/`
+6. Update `AppModule` with repositories
+7. Update `AppModule` with use cases
 
-### Modificando una Entidad
+### Modifying an Entity
 
-1. Actualizar entidad de dominio
-2. Actualizar entidad MikroORM
-3. Actualizar repositorios que la usan
-4. Verificar que todo compile
+1. Update domain entity
+2. Update MikroORM entity
+3. Update repositories that use it
+4. Verify everything compiles
 
-### Comandos Útiles
+### Useful Commands
 
 ```bash
-# Desarrollo
-npm run start:dev        # Iniciar en modo desarrollo
-npm run build            # Compilar
+# Development
+npm run start:dev        # Start in development mode
+npm run build            # Compile
 
-# Verificación
-npx tsc --noEmit         # Verificar tipos
+# Verification
+npx tsc --noEmit         # Check types
 ```
 
 ---
 
-## Recursos
+## Resources
 
-### Documentación
-- `AGENTS.md` - Restricciones y patrones de IA
-- Documentación de chepibe/docs/ - Arquitectura completa
+### Documentation
+- `AGENTS.md` - AI constraints and patterns
+- `docs/` - Full architecture documentation
 
-### Ubicaciones de Código
-- `src/domain/entities/` - Entidades de dominio
-- `src/application/use-cases/` - Casos de uso
-- `src/infrastructure/` - Servicios externos y repositorios
-- `src/presentation/` - Controladores
+### Code Locations
+- `src/domain/entities/` - Domain entities
+- `src/application/use-cases/` - Use cases
+- `src/infrastructure/` - External services and repositories
+- `src/presentation/` - Controllers
 
-### Comandos
+### Commands
 ```bash
-# Desarrollo
-npm run start            # Iniciar
-npm run start:dev        # Iniciar en watch mode
-npm run build            # Compilar
+# Development
+npm run start            # Start
+npm run start:dev        # Start in watch mode
+npm run build            # Compile
 
-# Verificación
-npx tsc --noEmit         # Verificar tipos
+# Verification
+npx tsc --noEmit         # Check types
 ```
 
 ---
 
-## Consejos para Trabajar con IA
+## Tips for Working with AI
 
-1. **Ser Específico** - No decir "arreglalo", decir "arreglar el error de tipo en línea 45"
-2. **Proveer Contexto** - Referenciar código similar, docs, patrones
-3. **Iterar** - Empezar pequeño, revisar, luego expandir
-4. **Verificar** - Siempre revisar el código generado por IA
-5. **Documentar** - Actualizar docs mientras se avanza
-6. **Testear** - Verificar que los cambios funcionen
-7. **Commit Frecuentemente** - Commits pequeños y focalizados
+1. **Be Specific** - Don't say "fix it", say "fix the type error on line 45"
+2. **Provide Context** - Reference similar code, docs, patterns
+3. **Iterate** - Start small, review, then expand
+4. **Verify** - Always review AI-generated code
+5. **Document** - Update docs as you go
+6. **Test** - Verify that changes work
+7. **Commit Often** - Small, focused commits
 
 ---
 
-*Este proyecto es un testimonio del desarrollo asistido por IA. La combinación de Clean Architecture, documentación comprehensiva, y herramientas de IA permite desarrollo rápido y mantenible.*
+*This project is a testament to AI-assisted development. The combination of Clean Architecture, comprehensive documentation, and AI tools enables fast and maintainable development.*
 
-*Última Actualización: Abril 2026*
+*Last Updated: April 2026*

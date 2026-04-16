@@ -1,11 +1,8 @@
-# Books API
+# Scaffold Nest JS
+
+> This project is a clone of [r-argentina-programa/arquitectura](https://github.com/r-argentina-programa/arquitectura/tree/main).
 
 Example project demonstrating **Clean Architecture** with NestJS and MikroORM.
-
-## Slides
-
-[View presentation](https://docs.google.com/presentation/d/1Hf2pUWK4uaJmgrl4XWM30xRTuxq7r3GYMjdX20GJkQc/edit?slide=id.g3d43dd60a97_0_249#slide=id.g3d43dd60a97_0_249)
-[View class](https://www.youtube.com/watch?v=RltjVf7PaPA)
 
 ## Architecture
 

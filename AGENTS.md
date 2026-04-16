@@ -1,7 +1,5 @@
 # How to Use This Project with AI
 
-> This project is a clone of [r-argentina-programa/arquitectura](https://github.com/r-argentina-programa/arquitectura/tree/main).
-
 > Guide for understanding the structure of this project and how AI is used in development
 
 ## Introduction

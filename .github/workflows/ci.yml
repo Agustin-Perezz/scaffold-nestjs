@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
 
     steps:
       - name: Checkout code
@@ -44,7 +44,7 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
 
     services:
       postgres:
@@ -94,7 +94,7 @@ jobs:
     needs: e2e
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [22.x]
 
     steps:
       - name: Checkout code

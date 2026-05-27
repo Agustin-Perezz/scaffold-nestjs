@@ -1,7 +1,7 @@
 import { MikroORM } from '@mikro-orm/core';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 
 import { BooksModule } from '../src/books.module';
 
@@ -15,7 +15,7 @@ describe('Books Controller (e2e)', () => {
     }).compile();
 
     const orm = moduleFixture.get(MikroORM);
-    await orm.schema.refreshDatabase();
+    await orm.schema.ensureDatabase();
 
     app = moduleFixture.createNestApplication();
 

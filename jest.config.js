@@ -8,11 +8,19 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'd.ts'],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
-    '^uuid$': '<rootDir>/node_modules/uuid/dist/cjs/index.js',
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: '<rootDir>/tsconfig.json',
+    '^.+\\.(ts|tsx|js|jsx)$': ['@swc/jest', {
+      jsc: {
+        parser: { syntax: 'typescript', decorators: true },
+        target: 'es2021',
+        transform: {
+          legacyDecorator: true,
+          decoratorMetadata: true,
+        },
+      },
+      module: { type: 'commonjs' },
     }],
   },
+  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid))'],
 };

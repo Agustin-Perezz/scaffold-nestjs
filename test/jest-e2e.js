@@ -4,6 +4,7 @@ module.exports = {
   testEnvironment: 'node',
   rootDir: '..',
   testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
   coverageDirectory: '<rootDir>/coverage',

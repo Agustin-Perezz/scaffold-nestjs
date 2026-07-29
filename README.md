@@ -110,6 +110,11 @@ pnpm start:prod         # Production
 pnpm test               # Unit tests
 pnpm test:e2e           # E2E tests
 
+# Linting / Formatting
+pnpm lint               # Lint source code
+pnpm format             # Format source code
+pnpm check              # Lint + format + organize imports
+
 # Docker
 pnpm docker:up          # Start PostgreSQL
 pnpm docker:down        # Stop PostgreSQL

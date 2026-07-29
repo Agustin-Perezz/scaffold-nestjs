@@ -48,7 +48,11 @@ export class BooksController {
 
   @Get()
   @ApiOperation({ summary: 'List all books' })
-  @ApiResponse({ status: 200, description: 'List of books', type: ListBooksResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'List of books',
+    type: ListBooksResponseDto,
+  })
   async list(): Promise<ListBooksResponseDto> {
     return this.listBooksUseCase.execute();
   }
@@ -56,7 +60,11 @@ export class BooksController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a book by ID' })
   @ApiParam({ name: 'id', description: 'Book ID' })
-  @ApiResponse({ status: 200, description: 'Book found', type: GetBookResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Book found',
+    type: GetBookResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Book not found' })
   async get(@Param('id') id: string): Promise<GetBookResponseDto> {
     return this.getBookUseCase.execute(id);
@@ -65,7 +73,11 @@ export class BooksController {
   @Put(':id')
   @ApiOperation({ summary: 'Update a book' })
   @ApiParam({ name: 'id', description: 'Book ID' })
-  @ApiResponse({ status: 200, description: 'Book updated', type: UpdateBookResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Book updated',
+    type: UpdateBookResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Book not found' })
   async update(
     @Param('id') id: string,

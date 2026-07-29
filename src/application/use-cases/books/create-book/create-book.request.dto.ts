@@ -2,7 +2,10 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateBookRequestDto {
-  @ApiProperty({ description: 'Book title', example: 'The Pragmatic Programmer' })
+  @ApiProperty({
+    description: 'Book title',
+    example: 'The Pragmatic Programmer',
+  })
   @IsString()
   title: string;
 
@@ -20,7 +23,10 @@ export class CreateBookRequestDto {
   @Max(9999)
   publicationYear: number;
 
-  @ApiPropertyOptional({ description: 'Genre of the book', example: 'Software Engineering' })
+  @ApiPropertyOptional({
+    description: 'Genre of the book',
+    example: 'Software Engineering',
+  })
   @IsOptional()
   @IsString()
   genre?: string | null;

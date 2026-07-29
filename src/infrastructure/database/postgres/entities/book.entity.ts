@@ -1,31 +1,14 @@
-import { Entity, Index, PrimaryKey, Property } from '@mikro-orm/postgresql';
+import { defineEntity } from '@mikro-orm/core';
 import { v7 as uuidv7 } from 'uuid';
 
-@Entity({ tableName: 'books' })
 export class BookEntity {
-  @PrimaryKey()
   id: string = uuidv7();
-
-  @Index()
-  @Property()
   title: string;
-
-  @Property()
   author: string;
-
-  @Property({ unique: true })
   isbn: string;
-
-  @Property()
   publicationYear: number;
-
-  @Property({ nullable: true })
   genre: string | null = null;
-
-  @Property()
   createdAt: Date = new Date();
-
-  @Property({ onUpdate: () => new Date() })
   updatedAt: Date = new Date();
 
   constructor(title: string, author: string, isbn: string, publicationYear: number) {
@@ -35,3 +18,18 @@ export class BookEntity {
     this.publicationYear = publicationYear;
   }
 }
+
+export const BookEntitySchema = defineEntity({
+  class: BookEntity,
+  tableName: 'books',
+  properties: (p) => ({
+    id: p.uuid().primary(),
+    title: p.string().index(),
+    author: p.string(),
+    isbn: p.string().unique(),
+    publicationYear: p.integer(),
+    genre: p.string().nullable(),
+    createdAt: p.datetime(),
+    updatedAt: p.datetime().onUpdate(() => new Date()),
+  }),
+});

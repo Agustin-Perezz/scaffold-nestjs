@@ -7,7 +7,7 @@ import { DeleteBookUseCase } from './application/use-cases/books/delete-book/del
 import { GetBookUseCase } from './application/use-cases/books/get-book/get-book.use-case';
 import { ListBooksUseCase } from './application/use-cases/books/list-books/list-books.use-case';
 import { UpdateBookUseCase } from './application/use-cases/books/update-book/update-book.use-case';
-import { BookEntity } from './infrastructure/database/postgres/entities/book.entity';
+import { BookEntitySchema } from './infrastructure/database/postgres/entities/book.entity';
 import { CreateBookRepository } from './infrastructure/database/postgres/repositories/books/create-book.repository';
 import { DeleteBookRepository } from './infrastructure/database/postgres/repositories/books/delete-book.repository';
 import { GetBookRepository } from './infrastructure/database/postgres/repositories/books/get-book.repository';
@@ -48,10 +48,10 @@ import { BooksController } from './presentation/controllers/books/books.controll
     MikroOrmModule.forRoot({
       driver: PostgreSqlDriver,
       clientUrl: `postgresql://${process.env.DB_USERNAME || 'postgres'}:${process.env.DB_PASSWORD || 'postgres'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'books'}`,
-      entities: [BookEntity],
+      entities: [BookEntitySchema],
       allowGlobalContext: true,
     }),
-    MikroOrmModule.forFeature([BookEntity]),
+    MikroOrmModule.forFeature([BookEntitySchema]),
   ],
 })
 export class BooksModule {}

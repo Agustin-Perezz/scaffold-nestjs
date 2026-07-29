@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, Index } from '@mikro-orm/postgresql';
+import { Entity, Index, PrimaryKey, Property } from '@mikro-orm/postgresql';
 import { v7 as uuidv7 } from 'uuid';
 
 @Entity({ tableName: 'books' })

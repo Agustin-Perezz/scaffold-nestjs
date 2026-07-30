@@ -1,28 +1,10 @@
-import { defineEntity } from '@mikro-orm/core';
+import { defineEntity, p } from '@mikro-orm/core';
 import { v7 as uuidv7 } from 'uuid';
 
-export class BookEntity {
-  id: string = uuidv7();
-  title: string;
-  author: string;
-  isbn: string;
-  publicationYear: number;
-  genre: string | null = null;
-  createdAt: Date = new Date();
-  updatedAt: Date = new Date();
-
-  constructor(title: string, author: string, isbn: string, publicationYear: number) {
-    this.title = title;
-    this.author = author;
-    this.isbn = isbn;
-    this.publicationYear = publicationYear;
-  }
-}
-
-export const BookEntitySchema = defineEntity({
-  class: BookEntity,
+const BookEntitySchema = defineEntity({
+  name: 'BookEntity',
   tableName: 'books',
-  properties: (p) => ({
+  properties: {
     id: p.uuid().primary(),
     title: p.string().index(),
     author: p.string(),
@@ -31,5 +13,24 @@ export const BookEntitySchema = defineEntity({
     genre: p.string().nullable(),
     createdAt: p.datetime(),
     updatedAt: p.datetime().onUpdate(() => new Date()),
-  }),
+  },
 });
+
+export class BookEntity extends BookEntitySchema.class {
+  id = uuidv7();
+  genre: string | null = null;
+  createdAt = new Date();
+  updatedAt = new Date();
+
+  constructor(title: string, author: string, isbn: string, publicationYear: number) {
+    super();
+    this.title = title;
+    this.author = author;
+    this.isbn = isbn;
+    this.publicationYear = publicationYear;
+  }
+}
+
+BookEntitySchema.setClass(BookEntity);
+
+export { BookEntitySchema };

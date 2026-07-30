@@ -39,7 +39,12 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: '<rootDir>/coverage',
+  coverageDirectory: '<rootDir>/coverage/e2e',
+  coverageReporters: ['text', 'lcov', 'html'],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts'],
+  coverageThreshold: {
+    global: { lines: 80, functions: 80, branches: 80, statements: 80 },
+  },
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
@@ -215,8 +220,35 @@ pnpm test:e2e
 # Single file
 npx jest --config ./test/jest-e2e.js --testPathPattern=books
 
-# With coverage
+# E2E with coverage (writes to coverage/e2e/, fails below 80% threshold)
+pnpm test:e2e:cov
+
+# Unit with coverage (writes to coverage/unit/)
 pnpm test:cov
+```
+
+## Coverage
+
+Coverage is collected per suite into separate directories so each can run
+independently and both can feed external quality gates:
+
+| Suite | Output dir                | lcov path                      |
+|-------|---------------------------|--------------------------------|
+| Unit  | `coverage/unit/`          | `coverage/unit/lcov.info`      |
+| E2E   | `coverage/e2e/`           | `coverage/e2e/lcov.info`       |
+
+Both Jest configs enforce an **80% threshold** on lines, functions, branches
+and statements — the build fails if any metric drops below. `src/main.ts`
+(app bootstrap) is excluded from coverage because it is not exercised by the
+test suites.
+
+### SonarQube integration
+
+Feed both reports to SonarQube via comma-separated paths in
+`sonar-project.properties`:
+
+```properties
+sonar.javascript.lcov.reportPaths=coverage/unit/lcov.info,coverage/e2e/lcov.info
 ```
 
 ## Important Notes

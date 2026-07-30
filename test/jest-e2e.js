@@ -7,7 +7,12 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: '<rootDir>/coverage',
+  coverageDirectory: '<rootDir>/coverage/e2e',
+  coverageReporters: ['text', 'lcov', 'html'],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts'],
+  coverageThreshold: {
+    global: { lines: 80, functions: 80, branches: 80, statements: 80 },
+  },
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },

@@ -1,7 +1,7 @@
 import { MikroORM } from '@mikro-orm/core';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 
 import { BooksModule } from '../src/books.module';
 
@@ -15,7 +15,7 @@ describe('Books Controller (e2e)', () => {
     }).compile();
 
     const orm = moduleFixture.get(MikroORM);
-    await orm.schema.refreshDatabase();
+    await orm.schema.refresh();
 
     app = moduleFixture.createNestApplication();
 
@@ -153,9 +153,7 @@ describe('Books Controller (e2e)', () => {
     });
 
     it('should return 404 for invalid ID', () => {
-      return request(app.getHttpServer())
-        .get('/books/invalid-id')
-        .expect(404);
+      return request(app.getHttpServer()).get('/books/invalid-id').expect(404);
     });
   });
 
@@ -225,9 +223,7 @@ describe('Books Controller (e2e)', () => {
 
   describe('/books/:id (DELETE)', () => {
     it('should delete a book correctly', () => {
-      return request(app.getHttpServer())
-        .delete(`/books/${bookId}`)
-        .expect(204);
+      return request(app.getHttpServer()).delete(`/books/${bookId}`).expect(204);
     });
 
     it('should return 404 when deleting non-existent book', () => {
@@ -237,9 +233,7 @@ describe('Books Controller (e2e)', () => {
     });
 
     it('should return 404 when trying to get deleted book', () => {
-      return request(app.getHttpServer())
-        .get(`/books/${bookId}`)
-        .expect(404);
+      return request(app.getHttpServer()).get(`/books/${bookId}`).expect(404);
     });
   });
 
@@ -273,15 +267,13 @@ describe('Books Controller (e2e)', () => {
         })
         .expect(200);
 
-      expect(updateResponse.body.title).toBe('Design Patterns: Elements of Reusable Object-Oriented Software');
+      expect(updateResponse.body.title).toBe(
+        'Design Patterns: Elements of Reusable Object-Oriented Software',
+      );
 
-      await request(app.getHttpServer())
-        .delete(`/books/${createdBookId}`)
-        .expect(204);
+      await request(app.getHttpServer()).delete(`/books/${createdBookId}`).expect(204);
 
-      await request(app.getHttpServer())
-        .get(`/books/${createdBookId}`)
-        .expect(404);
+      await request(app.getHttpServer()).get(`/books/${createdBookId}`).expect(404);
     });
   });
 });

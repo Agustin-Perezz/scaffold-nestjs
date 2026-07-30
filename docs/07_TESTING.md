@@ -5,24 +5,26 @@
 ```mermaid
 graph TB
     subgraph TestEnvironment
-        JEST[Jest]
+        JEST[Jest 30]
         TSJEST[ts-jest]
+        SWC[SWC / @swc/jest]
         SUPER[Supertest]
-        MIKRO[MikroORM]
+        MIKRO[MikroORM 7]
     end
 
     subgraph Database
-        SQLITE[:memory:]
+        PG[(PostgreSQL)]
     end
 
     subgraph TestFiles
-        BOOKS[books.controller.e2e-spec.ts]
+        BOOKS[books.e2e-spec.ts]
     end
 
     JEST --> TSJEST
+    JEST --> SWC
     TSJEST --> SUPER
-    JEST --> MIKRO
-    MIKRO --> SQLITE
+    SWC --> MIKRO
+    MIKRO --> PG
     JEST --> BOOKS
 ```
 
@@ -34,19 +36,27 @@ module.exports = {
   testEnvironment: 'node',
   rootDir: '..',
   testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
   coverageDirectory: '<rootDir>/coverage',
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
-    '^uuid$': '<rootDir>/node_modules/uuid/dist/cjs/index.js',
   },
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: '<rootDir>/tsconfig.json',
-      isolatedModules: true,
+    '^.+\\.(ts|tsx|js|jsx)$': ['@swc/jest', {
+      jsc: {
+        parser: { syntax: 'typescript', decorators: true },
+        target: 'es2021',
+        transform: {
+          legacyDecorator: true,
+          decoratorMetadata: true,
+        },
+      },
+      module: { type: 'commonjs' },
     }],
   },
+  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid))'],
 };
 ```
 
@@ -57,7 +67,7 @@ graph TD
     subgraph beforeAll
         A1[Create Testing Module]
         A2[Configure MikroORM :memory:]
-        A3[refreshDatabase]
+        A3[refresh]
         A4[Create Nest Application]
         A5[Init App]
     end
@@ -81,18 +91,12 @@ graph TD
 beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
         imports: [
-            MikroOrmModule.forRoot({
-                driver: SqliteDriver,
-                dbName: ':memory:',
-                entities: [BookEntity],
-                allowGlobalContext: true,
-            }),
             BooksModule,
         ],
     }).compile();
 
     const orm = moduleFixture.get(MikroORM);
-    await orm.schema.refreshDatabase();
+    await orm.schema.refresh();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
@@ -217,7 +221,8 @@ pnpm test:cov
 
 ## Important Notes
 
-1. **In-memory database**: Each test run uses SQLite `:memory:`
-2. **Schema refresh**: `orm.schema.refreshDatabase()` recreates tables before tests
+1. **Database**: Tests use PostgreSQL via Docker (`pnpm docker:up` before running)
+2. **Schema refresh**: `orm.schema.refresh()` recreates tables before tests
 3. **Auto cleanup**: `afterAll` closes the application
 4. **Unique IDs**: IDs are UUIDs generated on each run
+5. **ESM transform**: MikroORM 7 and uuid 14 are ESM-only — `@swc/jest` transforms them to CJS for Jest

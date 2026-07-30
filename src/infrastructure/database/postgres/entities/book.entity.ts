@@ -1,37 +1,36 @@
-import { Entity, Index, PrimaryKey, Property } from '@mikro-orm/postgresql';
+import { defineEntity, p } from '@mikro-orm/core';
 import { v7 as uuidv7 } from 'uuid';
 
-@Entity({ tableName: 'books' })
-export class BookEntity {
-  @PrimaryKey()
-  id: string = uuidv7();
+const BookEntitySchema = defineEntity({
+  name: 'BookEntity',
+  tableName: 'books',
+  properties: {
+    id: p.uuid().primary(),
+    title: p.string().index(),
+    author: p.string(),
+    isbn: p.string().unique(),
+    publicationYear: p.integer(),
+    genre: p.string().nullable(),
+    createdAt: p.datetime(),
+    updatedAt: p.datetime().onUpdate(() => new Date()),
+  },
+});
 
-  @Index()
-  @Property()
-  title: string;
-
-  @Property()
-  author: string;
-
-  @Property({ unique: true })
-  isbn: string;
-
-  @Property()
-  publicationYear: number;
-
-  @Property({ nullable: true })
+export class BookEntity extends BookEntitySchema.class {
+  id = uuidv7();
   genre: string | null = null;
-
-  @Property()
-  createdAt: Date = new Date();
-
-  @Property({ onUpdate: () => new Date() })
-  updatedAt: Date = new Date();
+  createdAt = new Date();
+  updatedAt = new Date();
 
   constructor(title: string, author: string, isbn: string, publicationYear: number) {
+    super();
     this.title = title;
     this.author = author;
     this.isbn = isbn;
     this.publicationYear = publicationYear;
   }
 }
+
+BookEntitySchema.setClass(BookEntity);
+
+export { BookEntitySchema };

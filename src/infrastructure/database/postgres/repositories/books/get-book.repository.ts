@@ -14,11 +14,15 @@ export class GetBookRepository implements IGetBookRepository {
   ) {}
 
   async findById(id: string): Promise<Book | null> {
-    const entity = await this.repository.findOne({ id });
-    if (!entity) {
+    try {
+      const entity = await this.repository.findOne({ id });
+      if (!entity) {
+        return null;
+      }
+      return this.toDomain(entity);
+    } catch {
       return null;
     }
-    return this.toDomain(entity);
   }
 
   private toDomain(entity: BookEntity): Book {

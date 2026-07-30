@@ -104,12 +104,8 @@ export class Book {
     get title(): string { return this._title; }
 }
 
-// ❌ WRONG - Entity with MikroORM decorators
-@Entity()
-export class Book {
-    @PrimaryKey()
-    id: string;
-}
+// ❌ WRONG - Domain entity with MikroORM decorators
+// (MikroORM 7 removed decorators — use defineEntity in infrastructure layer instead)
 ```
 
 ### Repository per Operation
@@ -188,7 +184,7 @@ graph TB
     end
 
     subgraph Entities
-        C[BookEntity]
+        C[BookEntitySchema]
     end
 
     A --> B

@@ -58,6 +58,9 @@ pnpm test:e2e           # E2E tests
 
 # Verification
 npx tsc --noEmit        # Type check
+pnpm lint               # Lint source code
+pnpm format             # Format source code
+pnpm check              # Lint + format + organize imports
 ```
 
 ---
@@ -75,8 +78,8 @@ npx tsc --noEmit        # Type check
 ## Technologies
 
 - **Runtime**: Node.js
-- **Framework**: NestJS 10.x
-- **ORM**: MikroORM 6.x
+- **Framework**: NestJS 11.x
+- **ORM**: MikroORM 7.x
 - **Database**: PostgreSQL
 - **Validation**: class-validator
 - **Documentation**: Swagger (OpenAPI 3.0)

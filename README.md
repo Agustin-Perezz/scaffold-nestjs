@@ -1,5 +1,7 @@
 # Scaffold Nest JS
 
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Agustin-Perezz_scaffold-nestjs&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Agustin-Perezz_scaffold-nestjs)
+
 > This project is a clone of [r-argentina-programa/arquitectura](https://github.com/r-argentina-programa/arquitectura/tree/main).
 
 Example project demonstrating **Clean Architecture** with NestJS and MikroORM.

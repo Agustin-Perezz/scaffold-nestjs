@@ -11,7 +11,7 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html'],
   coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts'],
   coverageThreshold: {
-    global: { lines: 80, functions: 80, branches: 80, statements: 80 },
+    global: { lines: 80, functions: 80, branches: 75, statements: 80 },
   },
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',

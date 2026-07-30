@@ -6,6 +6,13 @@ module.exports = {
   testMatch: ['<rootDir>/src/**/*.spec.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'd.ts'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+  coverageDirectory: '<rootDir>/coverage/unit',
+  coverageReporters: ['text', 'lcov', 'html'],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts'],
+  coverageThreshold: {
+    global: { lines: 80, functions: 80, branches: 80, statements: 80 },
+  },
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
   },

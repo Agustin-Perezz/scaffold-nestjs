@@ -107,6 +107,8 @@ export interface IGetBookRepository {
 }
 ```
 
+> Note: `findById` catches invalid UUID format errors and returns `null` (resulting in a 404 response), rather than letting them bubble up as 500 errors.
+
 ### IListBooksRepository
 
 ```typescript

@@ -106,7 +106,7 @@ This project was developed using Claude Code with the following workflow:
 | Domain Entities | ✅ 100% | Pure TypeScript with factory methods |
 | Use Cases | ✅ 100% | One per operation pattern |
 | Repositories | ✅ 100% | One per use case pattern |
-| MikroORM Entities | ✅ 100% | With decorators |
+| MikroORM Entities | ✅ 100% | With defineEntity (MikroORM 7) |
 | Controllers | ✅ 100% | With Swagger |
 | DTOs | ✅ 100% | With class-validator |
 | Documentation | ✅ 100% | This file |
@@ -253,10 +253,13 @@ Before implementing, document:
 npx tsc --noEmit
 
 # Check lint
-npm run lint
+pnpm lint
 
 # Check build
-npm run build
+pnpm build
+
+# Check everything
+pnpm check
 ```
 
 ### 4. Use Direct Imports
@@ -278,8 +281,8 @@ export class Auto {
 }
 
 // INCORRECT
-@Entity()  // ❌ Not in domain
-export class Auto {}
+// MikroORM 7 removed decorators entirely — use defineEntity
+// in the infrastructure layer instead
 ```
 
 ### 6. One Repository Per Operation
@@ -341,6 +344,8 @@ npm run build            # Compile
 
 # Verification
 npx tsc --noEmit         # Check types
+pnpm lint                # Lint
+pnpm check               # Lint + format + organize imports
 ```
 
 ---
@@ -366,6 +371,7 @@ npm run build            # Compile
 
 # Verification
 npx tsc --noEmit         # Check types
+pnpm check               # Lint + format + organize imports
 ```
 
 ---

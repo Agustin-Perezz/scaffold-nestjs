@@ -27,7 +27,7 @@ src/
 
 ### Requirements
 
-- Node.js 18+
+- Node.js 20+
 - Docker and Docker Compose
 - pnpm
 
@@ -122,7 +122,7 @@ pnpm docker:logs        # View PostgreSQL logs
 
 # Verification
 npx tsc --noEmit        # Type check
-pnpm lint               # Run linter
+pnpm check              # Lint + format + organize imports
 ```
 
 ## Documentation

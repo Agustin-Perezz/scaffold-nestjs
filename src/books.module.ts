@@ -1,5 +1,4 @@
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Module } from '@nestjs/common';
 
 import { CreateBookUseCase } from './application/use-cases/books/create-book/create-book.use-case';
@@ -44,14 +43,6 @@ import { BooksController } from './presentation/controllers/books/books.controll
     UpdateBookUseCase,
     DeleteBookUseCase,
   ],
-  imports: [
-    MikroOrmModule.forRoot({
-      driver: PostgreSqlDriver,
-      clientUrl: `postgresql://${process.env.DB_USERNAME || 'postgres'}:${process.env.DB_PASSWORD || 'postgres'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}/${process.env.DB_NAME || 'books'}`,
-      entities: [BookEntitySchema],
-      allowGlobalContext: true,
-    }),
-    MikroOrmModule.forFeature([BookEntitySchema]),
-  ],
+  imports: [MikroOrmModule.forFeature([BookEntitySchema])],
 })
 export class BooksModule {}

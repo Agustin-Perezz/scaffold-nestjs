@@ -11,7 +11,7 @@
 | 02 | [ENTITIES](02_ENTITIES.md) | Domain entities (Book) |
 | 03 | [USE_CASES](03_USE_CASES.md) | Complete use case catalog |
 | 04 | [API](04_API.md) | REST endpoints and Swagger documentation |
-| 07 | [TESTING](07_TESTING.md) | E2E testing guide |
+| 07 | [TESTING](07_TESTING.md) | Testing guide (unit + e2e) |
 | — | [USE_CASE_PATTERN](USE_CASE_PATTERN.md) | Use case isolation pattern guide |
 
 ---
@@ -53,8 +53,10 @@ pnpm start:dev          # Development mode (watch)
 pnpm start:prod         # Production
 
 # Testing
-pnpm test               # Unit tests
-pnpm test:e2e           # E2E tests
+pnpm test               # Unit tests (domain entities)
+pnpm test:e2e           # E2E tests (SQLite in-memory, no Docker)
+pnpm test:cov           # Unit tests + coverage (coverage/unit/)
+pnpm test:e2e:cov       # E2E tests + coverage (coverage/e2e/)
 
 # Verification
 npx tsc --noEmit        # Type check
@@ -71,7 +73,7 @@ pnpm check              # Lint + format + organize imports
 |---------|-----|
 | API | http://localhost:3000 |
 | Swagger | http://localhost:3000/api |
-| Database | PostgreSQL (see docker-compose.yml) |
+| Database | PostgreSQL (see docker-compose.yml); SQLite in-memory for e2e tests |
 
 ---
 
@@ -80,7 +82,8 @@ pnpm check              # Lint + format + organize imports
 - **Runtime**: Node.js
 - **Framework**: NestJS 11.x
 - **ORM**: MikroORM 7.x
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL (SQLite in-memory for e2e tests)
 - **Validation**: class-validator
 - **Documentation**: Swagger (OpenAPI 3.0)
-- **Testing**: Jest + Supertest
+- **Testing**: Jest 30 + Supertest
+- **Seeding / Factories**: `@mikro-orm/seeder`, `@faker-js/faker`

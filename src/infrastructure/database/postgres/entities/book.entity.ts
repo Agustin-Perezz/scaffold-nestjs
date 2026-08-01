@@ -1,26 +1,22 @@
 import { defineEntity, p } from '@mikro-orm/core';
-import { v7 as uuidv7 } from 'uuid';
+
+import { BaseEntity } from './base.entity';
 
 const BookEntitySchema = defineEntity({
   name: 'BookEntity',
   tableName: 'books',
+  extends: BaseEntity,
   properties: {
-    id: p.uuid().primary(),
     title: p.string().index(),
     author: p.string(),
     isbn: p.string().unique(),
     publicationYear: p.integer(),
     genre: p.string().nullable(),
-    createdAt: p.datetime(),
-    updatedAt: p.datetime().onUpdate(() => new Date()),
   },
 });
 
 export class BookEntity extends BookEntitySchema.class {
-  id = uuidv7();
   genre: string | null = null;
-  createdAt = new Date();
-  updatedAt = new Date();
 
   constructor(title: string, author: string, isbn: string, publicationYear: number) {
     super();

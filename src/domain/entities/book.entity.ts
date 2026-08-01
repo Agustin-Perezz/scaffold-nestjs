@@ -1,14 +1,11 @@
-import { v7 as uuidv7 } from 'uuid';
+import { BaseEntity, type BaseEntityProps, generateBaseEntityProps } from './base.entity';
 
-export interface BookProperties {
-  id: string;
+export interface BookProperties extends BaseEntityProps {
   title: string;
   author: string;
   isbn: string;
   publicationYear: number;
   genre: string | null;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface CreateBookParams {
@@ -19,67 +16,43 @@ export interface CreateBookParams {
   genre?: string | null;
 }
 
-export interface ReconstructBookParams {
-  id: string;
+export interface ReconstructBookParams extends BaseEntityProps {
   title: string;
   author: string;
   isbn: string;
   publicationYear: number;
   genre: string | null;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
-export class Book {
-  private readonly _id: string;
+export class Book extends BaseEntity {
   private _title: string;
   private _author: string;
   private readonly _isbn: string;
   private _publicationYear: number;
   private _genre: string | null;
-  private readonly _createdAt: Date;
-  private _updatedAt: Date;
 
   private constructor(props: BookProperties) {
-    this._id = props.id;
+    super(props);
     this._title = props.title;
     this._author = props.author;
     this._isbn = props.isbn;
     this._publicationYear = props.publicationYear;
     this._genre = props.genre;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
   }
 
   static create(params: CreateBookParams): Book {
-    const now = new Date();
     return new Book({
-      id: uuidv7(),
+      ...generateBaseEntityProps(),
       title: params.title,
       author: params.author,
       isbn: params.isbn,
       publicationYear: params.publicationYear,
       genre: params.genre ?? null,
-      createdAt: now,
-      updatedAt: now,
     });
   }
 
   static reconstruct(params: ReconstructBookParams): Book {
-    return new Book({
-      id: params.id,
-      title: params.title,
-      author: params.author,
-      isbn: params.isbn,
-      publicationYear: params.publicationYear,
-      genre: params.genre,
-      createdAt: params.createdAt,
-      updatedAt: params.updatedAt,
-    });
-  }
-
-  get id(): string {
-    return this._id;
+    return new Book(params);
   }
 
   get title(): string {
@@ -102,31 +75,23 @@ export class Book {
     return this._genre;
   }
 
-  get createdAt(): Date {
-    return this._createdAt;
-  }
-
-  get updatedAt(): Date {
-    return this._updatedAt;
-  }
-
   updateTitle(title: string): void {
     this._title = title;
-    this._updatedAt = new Date();
+    this.touch();
   }
 
   updateAuthor(author: string): void {
     this._author = author;
-    this._updatedAt = new Date();
+    this.touch();
   }
 
   updatePublicationYear(year: number): void {
     this._publicationYear = year;
-    this._updatedAt = new Date();
+    this.touch();
   }
 
   updateGenre(genre: string | null): void {
     this._genre = genre;
-    this._updatedAt = new Date();
+    this.touch();
   }
 }

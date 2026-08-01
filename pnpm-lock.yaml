@@ -8,15 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@faker-js/faker':
+        specifier: ^10.5.0
+        version: 10.5.0
       '@mikro-orm/core':
-        specifier: ^7.1.8
-        version: 7.1.8(dataloader@2.2.3)
+        specifier: ^7.1.9
+        version: 7.1.9(dataloader@2.2.3)
       '@mikro-orm/nestjs':
         specifier: ^7.0.2
-        version: 7.0.2(@mikro-orm/core@7.1.8(dataloader@2.2.3))(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28)(reflect-metadata@0.2.2)
+        version: 7.0.2(@mikro-orm/core@7.1.9(dataloader@2.2.3))(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28)(reflect-metadata@0.2.2)
       '@mikro-orm/postgresql':
+        specifier: ^7.1.9
+        version: 7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))
+      '@mikro-orm/seeder':
         specifier: ^7.1.8
-        version: 7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))
+        version: 7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))
       '@nestjs/common':
         specifier: ^11.1.28
         version: 11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -52,8 +58,8 @@ importers:
         specifier: 2.5.6
         version: 2.5.6
       '@mikro-orm/sqlite':
-        specifier: ^7.1.8
-        version: 7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))
+        specifier: ^7.1.9
+        version: 7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))
       '@nestjs/cli':
         specifier: ^11.0.24
         version: 11.0.24(@swc/core@1.15.47)(@types/node@26.1.2)
@@ -381,6 +387,10 @@ packages:
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
 
+  '@faker-js/faker@10.5.0':
+    resolution: {integrity: sha512-bsxD8WLS5lIj7aaoCx1YJkktqYj5vlBUE6HWzu2Q51ksrGJ0H737ECCKlFU7Yf8Br45z9t99frBp/J7kzbMPAg==}
+    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
+
   '@inquirer/ansi@1.0.2':
     resolution: {integrity: sha512-S8qNSZiYzFd0wAcyG5AXCvUHC5Sr7xpZ9wZ2py9XR88jUz8wooStVx5M6dRzczbBWjic9NP7+rY0Xi7qqK/aMQ==}
     engines: {node: '>=18'}
@@ -651,8 +661,8 @@ packages:
   '@microsoft/tsdoc@0.16.0':
     resolution: {integrity: sha512-xgAyonlVVS+q7Vc7qLW0UrJU7rSFcETRWsqdXZtjzRU8dF+6CkozTK4V4y1LwOX7j8r/vHphjDeMeGI4tNGeGA==}
 
-  '@mikro-orm/core@7.1.8':
-    resolution: {integrity: sha512-hX/869Heo+EEzLEnJsL/c17T4N0qJEn9E6ZQv58nRaV2yIKZGa9FJFnqRXgo5H8wv1ktieQLXcfARs1pcXZofw==}
+  '@mikro-orm/core@7.1.9':
+    resolution: {integrity: sha512-kvkZuSNtihyASgv3Ax66MyJTZjetd8VyUXKBd8eUUiZaw6Modkbmgzsh7N051K4mbBFYliBCU7/OBfp4TgRxpQ==}
     engines: {node: '>= 22.17.0'}
     peerDependencies:
       dataloader: 2.2.3
@@ -669,23 +679,29 @@ packages:
       '@nestjs/core': ^11.0.5
       reflect-metadata: ^0.1.0 || ^0.2.0
 
-  '@mikro-orm/postgresql@7.1.8':
-    resolution: {integrity: sha512-jmYfVDErMFDDKQalWdzpiNnfre3HMquxxNLghxUWLjJ0EA1O2ggcoqEgjKFOISUp86Q2F5FTZDxM2qXEqT+XWg==}
+  '@mikro-orm/postgresql@7.1.9':
+    resolution: {integrity: sha512-jSgagtOQYRFkmMxc21Wm0nu5H4/+ndA8nzQF8A0GVoLdOtYuldQm6/6sXuciZH0lpVVtUdTaJ2x9Y2u8ipgOkw==}
     engines: {node: '>= 22.17.0'}
     peerDependencies:
-      '@mikro-orm/core': 7.1.8
+      '@mikro-orm/core': 7.1.9
 
-  '@mikro-orm/sql@7.1.8':
-    resolution: {integrity: sha512-hR4pbzlSdryniafc072ifs8PhIaksdSq2CZHABikEJadi40e+cEu3aXg32aHuXRje4epg5mCDmGwxDt4twxryA==}
+  '@mikro-orm/seeder@7.1.9':
+    resolution: {integrity: sha512-+dnjHzrCM0IUDXW5vTeC3Q2zOnnwjtc9pTE1xfFAXYptIl5lbHyUBb9gMCHehxBJAgI+q+QvD+aGJq4L40Uicg==}
     engines: {node: '>= 22.17.0'}
     peerDependencies:
-      '@mikro-orm/core': 7.1.8
+      '@mikro-orm/core': 7.1.9
 
-  '@mikro-orm/sqlite@7.1.8':
-    resolution: {integrity: sha512-8Mh2rjGMOydTSdSH2+eCqkJ9bfloIR8xC70mmA7WH4OFXSSBTP39CQB9oOLocd783v3fJ3iGfA1xpg4cn1HWaQ==}
+  '@mikro-orm/sql@7.1.9':
+    resolution: {integrity: sha512-TJEoSh9QCVV1goszPnqhhXflOq/8Es2vEQ/WVQAdeyJ9HzS9M3rAH2nLgk1qvVwVuIyAzYwMRUAVmuHz3lgkJQ==}
     engines: {node: '>= 22.17.0'}
     peerDependencies:
-      '@mikro-orm/core': 7.1.8
+      '@mikro-orm/core': 7.1.9
+
+  '@mikro-orm/sqlite@7.1.9':
+    resolution: {integrity: sha512-lB2j+u6Z2DBG+9lBqb5jmkbGYr8pHKVvUEdwiYdg93swT+S5wUbFXGbu5j/8wPkHlIzfeN6DLxIE+0B7wDWnSg==}
+    engines: {node: '>= 22.17.0'}
+    peerDependencies:
+      '@mikro-orm/core': 7.1.9
 
   '@napi-rs/wasm-runtime@1.2.0':
     resolution: {integrity: sha512-kDoONqMa+VnZ4vvvu/ZUurpJ4gkZU57e7g69qpNgWhYcZFPUHZM2CEMKm+cG6ufDVALbjMvfmMjFVqaK7uEMnA==}
@@ -3452,6 +3468,8 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@faker-js/faker@10.5.0': {}
+
   '@inquirer/ansi@1.0.2': {}
 
   '@inquirer/checkbox@4.3.2(@types/node@26.1.2)':
@@ -3826,21 +3844,21 @@ snapshots:
 
   '@microsoft/tsdoc@0.16.0': {}
 
-  '@mikro-orm/core@7.1.8(dataloader@2.2.3)':
+  '@mikro-orm/core@7.1.9(dataloader@2.2.3)':
     optionalDependencies:
       dataloader: 2.2.3
 
-  '@mikro-orm/nestjs@7.0.2(@mikro-orm/core@7.1.8(dataloader@2.2.3))(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28)(reflect-metadata@0.2.2)':
+  '@mikro-orm/nestjs@7.0.2(@mikro-orm/core@7.1.9(dataloader@2.2.3))(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.28)(reflect-metadata@0.2.2)':
     dependencies:
-      '@mikro-orm/core': 7.1.8(dataloader@2.2.3)
+      '@mikro-orm/core': 7.1.9(dataloader@2.2.3)
       '@nestjs/common': 11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core': 11.1.28(@nestjs/common@11.1.28(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.28)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       reflect-metadata: 0.2.2
 
-  '@mikro-orm/postgresql@7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))':
+  '@mikro-orm/postgresql@7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))':
     dependencies:
-      '@mikro-orm/core': 7.1.8(dataloader@2.2.3)
-      '@mikro-orm/sql': 7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))
+      '@mikro-orm/core': 7.1.9(dataloader@2.2.3)
+      '@mikro-orm/sql': 7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))
       kysely: 0.29.4
       pg: 8.22.0
       pg-cursor: 2.21.0(pg@8.22.0)
@@ -3850,15 +3868,19 @@ snapshots:
     transitivePeerDependencies:
       - pg-native
 
-  '@mikro-orm/sql@7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))':
+  '@mikro-orm/seeder@7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))':
     dependencies:
-      '@mikro-orm/core': 7.1.8(dataloader@2.2.3)
+      '@mikro-orm/core': 7.1.9(dataloader@2.2.3)
+
+  '@mikro-orm/sql@7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))':
+    dependencies:
+      '@mikro-orm/core': 7.1.9(dataloader@2.2.3)
       kysely: 0.29.4
 
-  '@mikro-orm/sqlite@7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))':
+  '@mikro-orm/sqlite@7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))':
     dependencies:
-      '@mikro-orm/core': 7.1.8(dataloader@2.2.3)
-      '@mikro-orm/sql': 7.1.8(@mikro-orm/core@7.1.8(dataloader@2.2.3))
+      '@mikro-orm/core': 7.1.9(dataloader@2.2.3)
+      '@mikro-orm/sql': 7.1.9(@mikro-orm/core@7.1.9(dataloader@2.2.3))
       better-sqlite3: 12.11.1
       kysely: 0.29.4
 

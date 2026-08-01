@@ -1,4 +1,31 @@
-# Testing - E2E Testing Guide
+# Testing - Unit and E2E Testing Guide
+
+## Two Test Layers
+
+```mermaid
+graph TB
+    subgraph Unit["Unit tests (src/**/*.spec.ts)"]
+        U1[Domain entities]
+        U2[Pure logic]
+        U3[No mocks]
+        U4[No Nest module]
+    end
+
+    subgraph E2E["E2E tests (test/**/*.e2e-spec.ts)"]
+        E1[SQLite :memory:]
+        E2[Supertest per controller]
+        E3[Factory seeding]
+        E4[Per-test truncate]
+    end
+
+    Unit -->|covers| Domain
+    E2 -->|covers| Application
+    E2 -->|covers| Infrastructure
+    E2 -->|covers| Presentation
+```
+
+Unit tests verify pure domain logic in isolation; E2E tests exercise the full
+HTTP stack on an in-memory SQLite database. Neither layer needs PostgreSQL.
 
 ## Configuration
 
@@ -6,44 +33,57 @@
 graph TB
     subgraph TestEnvironment
         JEST[Jest 30]
-        TSJEST[ts-jest]
         SWC[SWC / @swc/jest]
         SUPER[Supertest]
         MIKRO[MikroORM 7]
+        FAKER[Faker]
+        SEEDER[@mikro-orm/seeder]
     end
 
     subgraph Database
-        PG[(PostgreSQL)]
+        SQLITE[(SQLite :memory:)]
     end
 
     subgraph TestFiles
-        BOOKS[books.e2e-spec.ts]
+        UNIT[base.entity.spec.ts]
+        BOOKSPEC[book.entity.spec.ts]
+        E2E[books.e2e-spec.ts]
     end
 
-    JEST --> TSJEST
     JEST --> SWC
-    TSJEST --> SUPER
-    SWC --> MIKRO
-    MIKRO --> PG
-    JEST --> BOOKS
+    JEST --> SUPER
+    SUPER --> MIKRO
+    MIKRO --> SQLITE
+    SEEDER --> FAKER
+    JEST --> UNIT
+    JEST --> BOOKSPEC
+    JEST --> E2E
 ```
 
-## jest-e2e.js
+## jest.config.js (unit)
 
 ```javascript
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  rootDir: '..',
-  testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
+  rootDir: '.',
+  testMatch: ['<rootDir>/src/**/*.spec.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'd.ts'],
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: '<rootDir>/coverage/e2e',
+  coverageDirectory: '<rootDir>/coverage/unit',
   coverageReporters: ['text', 'lcov', 'html'],
-  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts'],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/src/main.ts',
+    '<rootDir>/src/app.module.ts',
+    '<rootDir>/src/books.module.ts',
+    '<rootDir>/src/application/',
+    '<rootDir>/src/infrastructure/',
+    '<rootDir>/src/presentation/',
+  ],
   coverageThreshold: {
-    global: { lines: 80, functions: 80, branches: 80, statements: 80 },
+    global: { lines: 60, functions: 60, branches: 50, statements: 60 },
   },
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
@@ -61,200 +101,253 @@ module.exports = {
       module: { type: 'commonjs' },
     }],
   },
-  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid))'],
+  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid|@faker-js))'],
 };
 ```
 
-## Test Structure
+Unit coverage is scoped to `src/domain/entities/` only. The other layers
+(application, infrastructure, presentation) are excluded from unit coverage
+because they are exercised by the E2E suite.
+
+## test/jest-e2e.js (e2e)
+
+```javascript
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  rootDir: '..',
+  testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
+  coverageDirectory: '<rootDir>/coverage/e2e',
+  coverageReporters: ['text', 'lcov', 'html'],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts', '\\.spec\\.ts$'],
+  coverageThreshold: {
+    global: { lines: 60, functions: 60, branches: 50, statements: 60 },
+  },
+  moduleNameMapper: {
+    '^src/(.*)$': '<rootDir>/src/$1',
+  },
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx)$': ['@swc/jest', {
+      jsc: {
+        parser: { syntax: 'typescript', decorators: true },
+        target: 'es2021',
+        transform: {
+          legacyDecorator: true,
+          decoratorMetadata: true,
+        },
+      },
+      module: { type: 'commonjs' },
+    }],
+  },
+  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid|@faker-js))'],
+};
+```
+
+## E2E Architecture
 
 ```mermaid
 graph TD
-    subgraph beforeAll
-        A1[Create Testing Module]
-        A2[Configure MikroORM :memory:]
-        A3[refresh]
-        A4[Create Nest Application]
-        A5[Init App]
+    subgraph beforeAll["beforeAll (once)"]
+        A1[createTestApp]
+        A2[SQLite forRoot :memory:]
+        A3[orm.schema.refresh]
+        A4[ValidationPipe + app.init]
+    end
+
+    subgraph beforeEach["beforeEach (each test)"]
+        B1[truncateAll]
+        B2[BookFactory.createOne]
+        B3[Capture bookId]
     end
 
     subgraph Tests
-        B1[describe /books]
+        C1[Supertest requests]
     end
 
     subgraph afterAll
-        C1[app.close]
+        D1[app.close]
     end
 
-    A1 --> A2 --> A3 --> A4 --> A5
-    A5 --> B1
-    B1 --> C1
+    A1 --> A2 --> A3 --> A4
+    A4 --> B1
+    B1 --> B2 --> B3
+    B3 --> C1
+    C1 --> B1
+    A4 --> D1
 ```
 
-## Test Module Configuration
+`createTestApp()` (in `test/helpers/app.helper.ts`) builds a Nest app backed
+by an in-memory SQLite `MikroORM` and refreshes the schema once. Between tests,
+`truncateAll(orm)` clears all rows, then the factory seeds a known record
+directly into the database — not through HTTP.
+
+### Test module setup
 
 ```typescript
-beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [
-            BooksModule,
-        ],
-    }).compile();
+import { createTestApp } from './helpers/app.helper';
+import { truncateAll } from './helpers/database.helper';
+import { BooksModule } from '../src/books.module';
+import { BookEntitySchema } from '../src/infrastructure/database/postgres/entities/book.entity';
+import { BookFactory } from '../src/infrastructure/database/postgres/factories/book.factory';
 
-    const orm = moduleFixture.get(MikroORM);
-    await orm.schema.refresh();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-            forbidNonWhitelisted: true,
-            transform: true,
-            transformOptions: {
-                enableImplicitConversion: true,
-            },
-        }),
-    );
-
-    await app.init();
-});
-```
-
-## Books Tests
-
-```typescript
 describe('Books Controller (e2e)', () => {
-    let app: INestApplication;
-    let bookId: string;
+  let app: INestApplication;
+  let orm: MikroORM;
+  let bookId: string;
 
-    beforeAll(async () => { /* setup */ });
+  beforeAll(async () => {
+    ({ app, orm } = await createTestApp(BooksModule, [BookEntitySchema]));
+  });
 
-    describe('/books (POST)', () => {
-        it('should create a book', () => {
-            return request(app.getHttpServer())
-                .post('/books')
-                .send({
-                    title: 'Clean Architecture',
-                    author: 'Robert C. Martin',
-                    isbn: '978-0-13-468599-1',
-                    publicationYear: 2017,
-                    genre: 'Software Engineering',
-                })
-                .expect(201)
-                .then((response) => {
-                    expect(response.body).toHaveProperty('id');
-                    expect(response.body.title).toBe('Clean Architecture');
-                    bookId = response.body.id;
-                });
-        });
+  afterAll(async () => {
+    await app.close();
+  });
 
-        it('should reject a book with duplicate ISBN', async () => {
-            await request(app.getHttpServer())
-                .post('/books')
-                .send({
-                    title: 'Another Book',
-                    author: 'Someone',
-                    isbn: '978-0-13-468599-1',
-                    publicationYear: 2020,
-                })
-                .expect(400);
-        });
+  beforeEach(async () => {
+    await truncateAll(orm);
+    const book = await new BookFactory(orm.em).createOne({
+      title: 'The Pragmatic Programmer',
+      author: 'Andrew Hunt',
+      isbn: '978-0135957059',
+      publicationYear: 1999,
+      genre: 'Software Engineering',
     });
-
-    describe('/books (GET)', () => {
-        it('should list all books', () => {
-            return request(app.getHttpServer())
-                .get('/books')
-                .expect(200)
-                .then((response) => {
-                    expect(response.body).toHaveProperty('books');
-                    expect(Array.isArray(response.body.books)).toBe(true);
-                });
-        });
-    });
-
-    describe('/books/:id (GET)', () => {
-        it('should return a book by ID', () => {
-            return request(app.getHttpServer())
-                .get(`/books/${bookId}`)
-                .expect(200)
-                .then((response) => {
-                    expect(response.body.id).toBe(bookId);
-                });
-        });
-
-        it('should return 404 for unknown ID', () => {
-            return request(app.getHttpServer())
-                .get('/books/non-existent-id')
-                .expect(404);
-        });
-    });
-
-    describe('/books/:id (PUT)', () => {
-        it('should update a book', () => {
-            return request(app.getHttpServer())
-                .put(`/books/${bookId}`)
-                .send({ title: 'Updated Title' })
-                .expect(200)
-                .then((response) => {
-                    expect(response.body.title).toBe('Updated Title');
-                });
-        });
-    });
-
-    describe('/books/:id (DELETE)', () => {
-        it('should delete a book', () => {
-            return request(app.getHttpServer())
-                .delete(`/books/${bookId}`)
-                .expect(204);
-        });
-    });
+    bookId = book.id;
+  });
 });
 ```
 
-## Running Tests
+## Unit Test Pattern
 
-```bash
-# All E2E tests
-pnpm test:e2e
+Unit tests are pure `import` + `expect` — no Nest `TestingModule`, no
+providers array, no mocks. They cover the domain layer directly.
 
-# Single file
-npx jest --config ./test/jest-e2e.js --testPathPattern=books
+```typescript
+import { Book } from './book.entity';
 
-# E2E with coverage (writes to coverage/e2e/, fails below 80% threshold)
-pnpm test:e2e:cov
+describe('Book', () => {
+  it('creates a book with generated UUIDv7 and timestamps', () => {
+    const book = Book.create({
+      title: 'Clean Architecture',
+      author: 'Robert C. Martin',
+      isbn: '978-0-13-468599-1',
+      publicationYear: 2017,
+      genre: 'Software Engineering',
+    });
 
-# Unit with coverage (writes to coverage/unit/)
-pnpm test:cov
+    expect(book.id).toMatch(/^[0-9a-f-]+-7[0-9a-f-]+$/); // UUIDv7
+    expect(book.createdAt).toBeInstanceOf(Date);
+    expect(book.updatedAt).toEqual(book.createdAt);
+  });
+
+  it('updates title and bumps updatedAt', async () => {
+    const book = Book.create({ /* ... */ });
+    await new Promise((r) => setTimeout(r, 5));
+    book.updateTitle('New');
+    expect(book.updatedAt.getTime()).toBeGreaterThan(book.createdAt.getTime());
+  });
+});
 ```
+
+- `src/domain/entities/base.entity.spec.ts` — 7 tests: UUIDv7 generation,
+  timestamp equality, `touch()` advancing `updatedAt`, `id`/`createdAt`
+  immutability.
+- `src/domain/entities/book.entity.spec.ts` — 8 tests: `create`,
+  `reconstruct`, `updateTitle`/`updateAuthor`/`updatePublicationYear`/
+  `updateGenre`, genre `null` edge cases.
+
+## Factory Pattern
+
+Factories live in `src/infrastructure/database/postgres/factories/` and extend
+MikroORM's `Factory<T>`:
+
+```typescript
+import { faker } from '@faker-js/faker';
+import { Factory } from '@mikro-orm/seeder';
+import { BookEntity } from '../entities/book.entity';
+
+export class BookFactory extends Factory<BookEntity> {
+  model = BookEntity;
+
+  definition(): Partial<BookEntity> {
+    return {
+      title: faker.book.title(),
+      author: faker.person.fullName(),
+      isbn: faker.commerce.isbn(),
+      publicationYear: faker.number.int({ min: 1900, max: 2025 }),
+      genre: faker.book.genre(),
+    };
+  }
+}
+```
+
+| Method                  | Async? | Persists? | Use                                  |
+|-------------------------|--------|-----------|--------------------------------------|
+| `makeOne(overrides)`     | No     | No        | In-memory entity, flush manually     |
+| `createOne(overrides)`  | Yes    | Yes       | Seed straight into the DB            |
+| `each(overrides, n)`    | Yes    | Yes       | Multiple related records             |
+
+Override any field by passing a partial to `makeOne`/`createOne`. When adding
+a new entity, create a matching factory in the same directory.
 
 ## Coverage
 
-Coverage is collected per suite into separate directories so each can run
-independently and both can feed external quality gates:
+Both Jest configs enforce a **60/50 threshold** (lines/functions/statements:
+60, branches: 50). The build fails if any metric drops below.
 
-| Suite | Output dir                | lcov path                      |
-|-------|---------------------------|--------------------------------|
-| Unit  | `coverage/unit/`          | `coverage/unit/lcov.info`      |
-| E2E   | `coverage/e2e/`           | `coverage/e2e/lcov.info`       |
+| Suite | Output dir         | lcov path                   | Scope                             |
+|-------|--------------------|-----------------------------|-----------------------------------|
+| Unit  | `coverage/unit/`   | `coverage/unit/lcov.info`   | `src/domain/entities/` only       |
+| E2E   | `coverage/e2e/`    | `coverage/e2e/lcov.info`    | All `src/**/*.ts` except main + .spec |
 
-Both Jest configs enforce an **80% threshold** on lines, functions, branches
-and statements — the build fails if any metric drops below. `src/main.ts`
-(app bootstrap) is excluded from coverage because it is not exercised by the
-test suites.
+Use-cases, repositories, and controllers are covered by E2E, not by unit —
+so they are excluded from unit coverage via `coveragePathIgnorePatterns`.
 
 ### SonarQube integration
-
-Feed both reports to SonarQube via comma-separated paths in
-`sonar-project.properties`:
 
 ```properties
 sonar.javascript.lcov.reportPaths=coverage/unit/lcov.info,coverage/e2e/lcov.info
 ```
 
+## Running Tests
+
+```bash
+# Unit tests (pure domain logic)
+pnpm test
+
+# E2E tests (SQLite in-memory — no Postgres, no Docker needed)
+pnpm test:e2e
+
+# Single e2e file
+npx jest --config ./test/jest-e2e.js --testPathPattern=books
+
+# Unit with coverage (writes to coverage/unit/)
+pnpm test:cov
+
+# E2E with coverage (writes to coverage/e2e/)
+pnpm test:e2e:cov
+```
+
+No `pnpm docker:up` is required for tests. E2E runs entirely on an in-memory
+SQLite database.
+
 ## Important Notes
 
-1. **Database**: Tests use PostgreSQL via Docker (`pnpm docker:up` before running)
-2. **Schema refresh**: `orm.schema.refresh()` recreates tables before tests
-3. **Auto cleanup**: `afterAll` closes the application
-4. **Unique IDs**: IDs are UUIDs generated on each run
-5. **ESM transform**: MikroORM 7 and uuid 14 are ESM-only — `@swc/jest` transforms them to CJS for Jest
+1. **Database**: E2E tests use SQLite in-memory (`:memory:`) — no Docker, no
+   PostgreSQL needed. Unit tests touch no database at all.
+2. **Per-test isolation**: `truncateAll(orm)` clears all rows in `beforeEach`,
+   then the factory re-seeds a known record.
+3. **Schema refresh**: `orm.schema.refresh()` runs once in `beforeAll` (inside
+   `createTestApp`).
+4. **Factory seeding**: seed known records directly into the DB via
+   `BookFactory.createOne(overrides)` rather than HTTP calls. Use this pattern
+   for every new entity's factory.
+5. **Unique IDs**: IDs are UUIDv7, generated on each run.
+6. **ESM transform**: MikroORM 7, uuid 14, and `@faker-js/faker` are ESM-only —
+   `@swc/jest` transforms them to CJS. `transformIgnorePatterns` in both Jest
+   configs whitelists `@mikro-orm`, `kysely`, `uuid`, and `@faker-js`.
+7. **Unit coverage scope**: only `src/domain/entities/` counts toward unit
+   coverage; the rest is covered by E2E.

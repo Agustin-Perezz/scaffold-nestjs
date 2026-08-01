@@ -41,9 +41,13 @@ graph TB
 
 ```
 src/
+├── app.module.ts                          # Root module (DatabaseModule + BooksModule)
+├── books.module.ts                        # forFeature([BookEntitySchema])
+│
 ├── domain/
 │   └── entities/
-│       └── book.entity.ts          # Pure entity (no decorators)
+│       ├── base.entity.ts                 # Abstract BaseEntity (id, createdAt, updatedAt, touch)
+│       └── book.entity.ts                 # Book extends BaseEntity (no decorators)
 │
 ├── application/
 │   └── use-cases/
@@ -56,9 +60,14 @@ src/
 │
 ├── infrastructure/
 │   └── database/
+│       ├── database.module.ts             # MikroOrmModule.forRoot (Postgres + SeedManager)
 │       └── postgres/
-│           ├── entities/               # MikroORM entities
-│           └── repositories/           # Implementations
+│           ├── entities/
+│           │   ├── base.entity.ts         # BaseEntitySchema (defineEntity, abstract)
+│           │   └── book.entity.ts         # BookEntity extends BaseEntity
+│           ├── factories/                 # MikroORM seeder factories (test seed data)
+│           │   └── book.factory.ts
+│           └── repositories/
 │               └── books/
 │
 └── presentation/
@@ -95,18 +104,29 @@ sequenceDiagram
 ### Pure Domain
 
 ```typescript
-// ✅ CORRECT - Entity without decorators
-export class Book {
-    private readonly _id: string;
+// ✅ CORRECT - Entity extends BaseEntity, no decorators
+import { BaseEntity, generateBaseEntityProps } from './base.entity';
+
+export class Book extends BaseEntity {
     private _title: string;
 
-    static create(params: CreateBookParams): Book { ... }
+    static create(params: CreateBookParams): Book {
+        return new Book({ ...generateBaseEntityProps(), title: params.title, /* ... */ });
+    }
+
     get title(): string { return this._title; }
 }
 
 // ❌ WRONG - Domain entity with MikroORM decorators
 // (MikroORM 7 removed decorators — use defineEntity in infrastructure layer instead)
 ```
+
+> **Note**: `BaseEntity` (domain) and `BaseEntitySchema` (infra) share the
+> same `id`, `createdAt`, and `updatedAt` contract. The domain `BaseEntity`
+> holds them as plain private fields with a `protected touch()`; the infra
+> `BaseEntitySchema` maps them to columns via `defineEntity({ abstract: true })`.
+> Domain entities extend the domain `BaseEntity`; MikroORM entities extend the
+> infra `BaseEntity`.
 
 ### Repository per Operation
 
@@ -178,8 +198,16 @@ providers: [
 
 ```mermaid
 graph TB
-    subgraph BooksModule
-        A[MikroOrmModule.forRoot]
+    subgraph AppModule["AppModule (root)"]
+        DBMOD[DatabaseModule]
+        BOOKSMOD[BooksModule]
+    end
+
+    subgraph DatabaseModule["DatabaseModule"]
+        A[MikroOrmModule.forRoot<br/>PostgreSQL + SeedManager]
+    end
+
+    subgraph BooksModule["BooksModule"]
         B[MikroOrmModule.forFeature]
     end
 
@@ -187,9 +215,15 @@ graph TB
         C[BookEntitySchema]
     end
 
+    DBMOD --> A
+    BOOKSMOD --> B
     A --> B
     B --> C
 ```
+
+`forRoot()` lives in `DatabaseModule` (PostgreSQL + `SeedManager` extension);
+`BooksModule` only registers `forFeature([BookEntitySchema])`. `AppModule`
+imports both, and `main.ts` bootstraps `AppModule`.
 
 ## Build and Execution
 

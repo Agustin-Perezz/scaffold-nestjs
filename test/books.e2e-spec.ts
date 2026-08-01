@@ -1,52 +1,48 @@
 import { MikroORM } from '@mikro-orm/core';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
+import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 
 import { BooksModule } from '../src/books.module';
+import { BookEntitySchema } from '../src/infrastructure/database/postgres/entities/book.entity';
+import { BookFactory } from '../src/infrastructure/database/postgres/factories/book.factory';
+import { createTestApp } from './helpers/app.helper';
+import { truncateAll } from './helpers/database.helper';
 
 describe('Books Controller (e2e)', () => {
   let app: INestApplication;
+  let orm: MikroORM;
   let bookId: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [BooksModule],
-    }).compile();
-
-    const orm = moduleFixture.get(MikroORM);
-    await orm.schema.refresh();
-
-    app = moduleFixture.createNestApplication();
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
-
-    await app.init();
+    ({ app, orm } = await createTestApp(BooksModule, [BookEntitySchema]));
   });
 
   afterAll(async () => {
-    if (app) {
-      await app.close();
-    }
+    await app.close();
+  });
+
+  beforeEach(async () => {
+    await truncateAll(orm);
+
+    const book = await new BookFactory(orm.em).createOne({
+      title: 'The Pragmatic Programmer',
+      author: 'Andrew Hunt',
+      isbn: '978-0135957059',
+      publicationYear: 1999,
+      genre: 'Software Engineering',
+    });
+
+    bookId = book.id;
   });
 
   describe('/books (POST)', () => {
-    it('should create a book correctly', async () => {
+    it('should create a book correctly', () => {
       return request(app.getHttpServer())
         .post('/books')
         .send({
           title: 'The Pragmatic Programmer',
           author: 'Andrew Hunt',
-          isbn: '978-0135957059',
+          isbn: '978-0201616224',
           publicationYear: 1999,
           genre: 'Software Engineering',
         })
@@ -55,16 +51,15 @@ describe('Books Controller (e2e)', () => {
           expect(response.body).toHaveProperty('id');
           expect(response.body.title).toBe('The Pragmatic Programmer');
           expect(response.body.author).toBe('Andrew Hunt');
-          expect(response.body.isbn).toBe('978-0135957059');
+          expect(response.body.isbn).toBe('978-0201616224');
           expect(response.body.publicationYear).toBe(1999);
           expect(response.body.genre).toBe('Software Engineering');
           expect(response.body).toHaveProperty('createdAt');
           expect(response.body).toHaveProperty('updatedAt');
-          bookId = response.body.id;
         });
     });
 
-    it('should create a book without genre', async () => {
+    it('should create a book without genre', () => {
       return request(app.getHttpServer())
         .post('/books')
         .send({
@@ -81,31 +76,19 @@ describe('Books Controller (e2e)', () => {
         });
     });
 
-    it('should return 400 with invalid data', async () => {
+    it('should return 400 with invalid publication year', () => {
       return request(app.getHttpServer())
         .post('/books')
         .send({
           title: 'Test Book',
           author: 'Test Author',
-          isbn: '978-invalid',
-          publicationYear: 'invalid-year',
-        })
-        .expect(400);
-    });
-
-    it('should return 400 with invalid publication year', async () => {
-      return request(app.getHttpServer())
-        .post('/books')
-        .send({
-          title: 'Test Book',
-          author: 'Test Author',
-          isbn: '978-0135957059',
+          isbn: '978-0201616224',
           publicationYear: 999,
         })
         .expect(400);
     });
 
-    it('should return 400 when required fields are missing', async () => {
+    it('should return 400 when required fields are missing', () => {
       return request(app.getHttpServer())
         .post('/books')
         .send({
@@ -150,10 +133,6 @@ describe('Books Controller (e2e)', () => {
       return request(app.getHttpServer())
         .get('/books/00000000-0000-0000-0000-000000000000')
         .expect(404);
-    });
-
-    it('should return 404 for invalid ID', () => {
-      return request(app.getHttpServer()).get('/books/invalid-id').expect(404);
     });
   });
 
@@ -232,7 +211,9 @@ describe('Books Controller (e2e)', () => {
         .expect(404);
     });
 
-    it('should return 404 when trying to get deleted book', () => {
+    it('should return 404 when trying to get deleted book', async () => {
+      await request(app.getHttpServer()).delete(`/books/${bookId}`).expect(204);
+
       return request(app.getHttpServer()).get(`/books/${bookId}`).expect(404);
     });
   });

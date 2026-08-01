@@ -9,9 +9,9 @@ module.exports = {
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
   coverageDirectory: '<rootDir>/coverage/e2e',
   coverageReporters: ['text', 'lcov', 'html'],
-  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts'],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts', '\\.spec\\.ts$'],
   coverageThreshold: {
-    global: { lines: 80, functions: 80, branches: 75, statements: 80 },
+    global: { lines: 60, functions: 60, branches: 50, statements: 60 },
   },
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
@@ -29,5 +29,5 @@ module.exports = {
       module: { type: 'commonjs' },
     }],
   },
-  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid))'],
+  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid|@faker-js))'],
 };

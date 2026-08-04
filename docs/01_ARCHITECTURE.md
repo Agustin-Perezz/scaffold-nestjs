@@ -99,27 +99,7 @@ sequenceDiagram
     Controller-->>Client: HTTP Response
 ```
 
-## Architecture Rules
-
-### Pure Domain
-
-```typescript
-// ✅ CORRECT - Entity extends BaseEntity, no decorators
-import { BaseEntity, generateBaseEntityProps } from './base.entity';
-
-export class Book extends BaseEntity {
-    private _title: string;
-
-    static create(params: CreateBookParams): Book {
-        return new Book({ ...generateBaseEntityProps(), title: params.title, /* ... */ });
-    }
-
-    get title(): string { return this._title; }
-}
-
-// ❌ WRONG - Domain entity with MikroORM decorators
-// (MikroORM 7 removed decorators — use defineEntity in infrastructure layer instead)
-```
+## Domain–Infrastructure Boundary
 
 > **Note**: `BaseEntity` (domain) and `BaseEntitySchema` (infra) share the
 > same `id`, `createdAt`, and `updatedAt` contract. The domain `BaseEntity`
@@ -128,43 +108,8 @@ export class Book extends BaseEntity {
 > Domain entities extend the domain `BaseEntity`; MikroORM entities extend the
 > infra `BaseEntity`.
 
-### Repository per Operation
-
-```typescript
-// ✅ CORRECT - Specific repository per operation
-export interface ICreateBookRepository {
-    create(book: Book): Promise<Book>;
-    existsByIsbn(isbn: string): Promise<boolean>;
-}
-
-// ❌ WRONG - Fat Repository
-export interface IBookRepository {
-    create(book: Book): Promise<Book>;
-    get(id: string): Promise<Book>;
-    list(): Promise<Book[]>;
-    update(book: Book): Promise<Book>;
-    delete(id: string): Promise<void>;
-    // ... more methods
-}
-```
-
-### Mandatory Transactions
-
-```typescript
-// ✅ CORRECT
-async create(book: Book): Promise<Book> {
-    return this.orm.em.transactional(async (em) => {
-        await em.persist(book).flush();
-        return book;
-    });
-}
-
-// ❌ WRONG
-async create(book: Book): Promise<Book> {
-    await this.em.persist(book).flush(); // No transaction
-    return book;
-}
-```
+> Architectural rules (pure domain, repository per operation, mandatory
+> transactions) live in `docs/rules/` and are loaded via `opencode.json`.
 
 ## Dependency Injection
 

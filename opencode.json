@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "docs/rules/domain.md",
+    "docs/rules/use-cases.md",
+    "docs/rules/repositories.md",
+    "docs/rules/relations.md",
+    "docs/rules/testing.md",
+    "docs/checklists/new-domain.md",
+    "docs/checklists/new-use-case.md",
+    "docs/checklists/new-entity.md"
+  ]
+}

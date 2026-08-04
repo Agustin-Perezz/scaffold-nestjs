@@ -20,8 +20,12 @@ export class UpdateBookUseCase {
     if (dto.title !== undefined) {
       book.updateTitle(dto.title);
     }
-    if (dto.author !== undefined) {
-      book.updateAuthor(dto.author);
+    if (dto.authorId !== undefined) {
+      const author = await this.repository.findAuthorById(dto.authorId);
+      if (!author) {
+        throw new NotFoundException('Author not found');
+      }
+      book.updateAuthorId(dto.authorId);
     }
     if (dto.publicationYear !== undefined) {
       book.updatePublicationYear(dto.publicationYear);
@@ -35,7 +39,7 @@ export class UpdateBookUseCase {
     return new UpdateBookResponseDto({
       id: updated.id,
       title: updated.title,
-      author: updated.author,
+      authorId: updated.authorId,
       isbn: updated.isbn,
       publicationYear: updated.publicationYear,
       genre: updated.genre,

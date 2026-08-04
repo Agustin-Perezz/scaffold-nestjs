@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { Book } from '../../../../domain/entities/book.entity';
 import { ICreateBookRepository } from './create-book.repository.interface';
@@ -13,6 +13,11 @@ export class CreateBookUseCase {
   ) {}
 
   async execute(dto: CreateBookRequestDto): Promise<CreateBookResponseDto> {
+    const author = await this.repository.findAuthorById(dto.authorId);
+    if (!author) {
+      throw new NotFoundException('Author not found');
+    }
+
     const isbnExists = await this.repository.existsByIsbn(dto.isbn);
     if (isbnExists) {
       throw new BadRequestException('A book with that ISBN already exists');
@@ -20,7 +25,7 @@ export class CreateBookUseCase {
 
     const book = Book.create({
       title: dto.title,
-      author: dto.author,
+      authorId: dto.authorId,
       isbn: dto.isbn,
       publicationYear: dto.publicationYear,
       genre: dto.genre,
@@ -31,7 +36,7 @@ export class CreateBookUseCase {
     return new CreateBookResponseDto({
       id: created.id,
       title: created.title,
-      author: created.author,
+      authorId: created.authorId,
       isbn: created.isbn,
       publicationYear: created.publicationYear,
       genre: created.genre,

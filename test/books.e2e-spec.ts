@@ -3,7 +3,9 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 
 import { BooksModule } from '../src/books.module';
+import { AuthorEntitySchema } from '../src/infrastructure/database/postgres/entities/author.entity';
 import { BookEntitySchema } from '../src/infrastructure/database/postgres/entities/book.entity';
+import { AuthorFactory } from '../src/infrastructure/database/postgres/factories/author.factory';
 import { BookFactory } from '../src/infrastructure/database/postgres/factories/book.factory';
 import { createTestApp } from './helpers/app.helper';
 import { truncateAll } from './helpers/database.helper';
@@ -12,9 +14,10 @@ describe('Books Controller (e2e)', () => {
   let app: INestApplication;
   let orm: MikroORM;
   let bookId: string;
+  let authorId: string;
 
   beforeAll(async () => {
-    ({ app, orm } = await createTestApp(BooksModule, [BookEntitySchema]));
+    ({ app, orm } = await createTestApp(BooksModule, [BookEntitySchema, AuthorEntitySchema]));
   });
 
   afterAll(async () => {
@@ -24,9 +27,12 @@ describe('Books Controller (e2e)', () => {
   beforeEach(async () => {
     await truncateAll(orm);
 
+    const author = await new AuthorFactory(orm.em).createOne({ name: 'Andrew Hunt' });
+    authorId = author.id;
+
     const book = await new BookFactory(orm.em).createOne({
       title: 'The Pragmatic Programmer',
-      author: 'Andrew Hunt',
+      author: authorId,
       isbn: '978-0135957059',
       publicationYear: 1999,
       genre: 'Software Engineering',
@@ -41,7 +47,7 @@ describe('Books Controller (e2e)', () => {
         .post('/books')
         .send({
           title: 'The Pragmatic Programmer',
-          author: 'Andrew Hunt',
+          authorId,
           isbn: '978-0201616224',
           publicationYear: 1999,
           genre: 'Software Engineering',
@@ -50,7 +56,7 @@ describe('Books Controller (e2e)', () => {
         .then((response) => {
           expect(response.body).toHaveProperty('id');
           expect(response.body.title).toBe('The Pragmatic Programmer');
-          expect(response.body.author).toBe('Andrew Hunt');
+          expect(response.body.authorId).toBe(authorId);
           expect(response.body.isbn).toBe('978-0201616224');
           expect(response.body.publicationYear).toBe(1999);
           expect(response.body.genre).toBe('Software Engineering');
@@ -64,7 +70,7 @@ describe('Books Controller (e2e)', () => {
         .post('/books')
         .send({
           title: 'Clean Code',
-          author: 'Robert Martin',
+          authorId,
           isbn: '978-0132350884',
           publicationYear: 2008,
         })
@@ -81,7 +87,7 @@ describe('Books Controller (e2e)', () => {
         .post('/books')
         .send({
           title: 'Test Book',
-          author: 'Test Author',
+          authorId,
           isbn: '978-0201616224',
           publicationYear: 999,
         })
@@ -93,9 +99,21 @@ describe('Books Controller (e2e)', () => {
         .post('/books')
         .send({
           title: 'Test Book',
-          author: 'Test Author',
+          authorId,
         })
         .expect(400);
+    });
+
+    it('should return 404 when author does not exist', () => {
+      return request(app.getHttpServer())
+        .post('/books')
+        .send({
+          title: 'Test Book',
+          authorId: '00000000-0000-0000-0000-000000000000',
+          isbn: '978-0201616224',
+          publicationYear: 1999,
+        })
+        .expect(404);
     });
   });
 
@@ -120,7 +138,7 @@ describe('Books Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.id).toBe(bookId);
           expect(response.body).toHaveProperty('title');
-          expect(response.body).toHaveProperty('author');
+          expect(response.body).toHaveProperty('authorId');
           expect(response.body).toHaveProperty('isbn');
           expect(response.body).toHaveProperty('publicationYear');
           expect(response.body).toHaveProperty('genre');
@@ -142,7 +160,6 @@ describe('Books Controller (e2e)', () => {
         .put(`/books/${bookId}`)
         .send({
           title: 'The Pragmatic Programmer: Your Journey to Mastery',
-          author: 'Andrew Hunt and David Thomas',
           publicationYear: 2020,
           genre: 'Software Development',
         })
@@ -150,7 +167,6 @@ describe('Books Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.id).toBe(bookId);
           expect(response.body.title).toBe('The Pragmatic Programmer: Your Journey to Mastery');
-          expect(response.body.author).toBe('Andrew Hunt and David Thomas');
           expect(response.body.publicationYear).toBe(2020);
           expect(response.body.genre).toBe('Software Development');
         });
@@ -179,6 +195,25 @@ describe('Books Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.genre).toBeNull();
         });
+    });
+
+    it('should update authorId to another existing author', async () => {
+      const otherAuthor = await new AuthorFactory(orm.em).createOne({ name: 'David Thomas' });
+
+      return request(app.getHttpServer())
+        .put(`/books/${bookId}`)
+        .send({ authorId: otherAuthor.id })
+        .expect(200)
+        .then((response) => {
+          expect(response.body.authorId).toBe(otherAuthor.id);
+        });
+    });
+
+    it('should return 404 when updating authorId to non-existent author', () => {
+      return request(app.getHttpServer())
+        .put(`/books/${bookId}`)
+        .send({ authorId: '00000000-0000-0000-0000-000000000000' })
+        .expect(404);
     });
 
     it('should return 404 when updating non-existent book', () => {
@@ -224,7 +259,7 @@ describe('Books Controller (e2e)', () => {
         .post('/books')
         .send({
           title: 'Design Patterns',
-          author: 'Gang of Four',
+          authorId,
           isbn: '978-0201633610',
           publicationYear: 1994,
           genre: 'Software Architecture',
@@ -238,7 +273,7 @@ describe('Books Controller (e2e)', () => {
         .get(`/books/${createdBookId}`)
         .expect(200);
 
-      expect(getResponse.body.author).toBe('Gang of Four');
+      expect(getResponse.body.authorId).toBe(authorId);
 
       const updateResponse = await request(app.getHttpServer())
         .put(`/books/${createdBookId}`)

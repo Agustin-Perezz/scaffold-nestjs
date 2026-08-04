@@ -12,7 +12,6 @@
 | 03 | [USE_CASES](03_USE_CASES.md) | Complete use case catalog |
 | 04 | [API](04_API.md) | REST endpoints and Swagger documentation |
 | 07 | [TESTING](07_TESTING.md) | Testing guide (unit + e2e) |
-| — | [USE_CASE_PATTERN](USE_CASE_PATTERN.md) | Use case isolation pattern guide |
 
 ---
 

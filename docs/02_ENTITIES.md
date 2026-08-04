@@ -129,51 +129,7 @@ const book = Book.reconstruct({
 > **Note**: `reconstruct` takes `BaseEntityProps` (`id`, `createdAt`,
 > `updatedAt`) as part of its params, since those fields live on `BaseEntity`.
 
----
-
-## Repository Interfaces
-
-### ICreateBookRepository
-
-```typescript
-export interface ICreateBookRepository {
-    create(book: Book): Promise<Book>;
-    existsByIsbn(isbn: string): Promise<boolean>;
-}
-```
-
-### IGetBookRepository
-
-```typescript
-export interface IGetBookRepository {
-    findById(id: string): Promise<Book | null>;
-}
-```
-
-> Note: `findById` catches invalid UUID format errors and returns `null` (resulting in a 404 response), rather than letting them bubble up as 500 errors.
-
-### IListBooksRepository
-
-```typescript
-export interface IListBooksRepository {
-    findAll(): Promise<Book[]>;
-}
-```
-
-### IUpdateBookRepository
-
-```typescript
-export interface IUpdateBookRepository {
-    findById(id: string): Promise<Book | null>;
-    save(book: Book): Promise<Book>;
-}
-```
-
-### IDeleteBookRepository
-
-```typescript
-export interface IDeleteBookRepository {
-    findById(id: string): Promise<Book | null>;
-    delete(id: string): Promise<void>;
-}
-```
+Repository interfaces live next to each use case under
+`src/application/use-cases/books/<action>-book/` and follow the
+one-repository-per-operation pattern documented in `AGENTS.md` and
+`docs/USE_CASE_PATTERN.md`.

@@ -58,93 +58,22 @@ graph TB
     JEST --> UNIT
     JEST --> BOOKSPEC
     JEST --> E2E
-```
+    ```
 
-## jest.config.js (unit)
+## Jest configs
 
-```javascript
-module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  rootDir: '.',
-  testMatch: ['<rootDir>/src/**/*.spec.ts'],
-  testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'd.ts'],
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: '<rootDir>/coverage/unit',
-  coverageReporters: ['text', 'lcov', 'html'],
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '<rootDir>/src/main.ts',
-    '<rootDir>/src/app.module.ts',
-    '<rootDir>/src/books.module.ts',
-    '<rootDir>/src/application/',
-    '<rootDir>/src/infrastructure/',
-    '<rootDir>/src/presentation/',
-  ],
-  coverageThreshold: {
-    global: { lines: 60, functions: 60, branches: 50, statements: 60 },
-  },
-  moduleNameMapper: {
-    '^src/(.*)$': '<rootDir>/src/$1',
-  },
-  transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': ['@swc/jest', {
-      jsc: {
-        parser: { syntax: 'typescript', decorators: true },
-        target: 'es2021',
-        transform: {
-          legacyDecorator: true,
-          decoratorMetadata: true,
-        },
-      },
-      module: { type: 'commonjs' },
-    }],
-  },
-  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid|@faker-js))'],
-};
-```
+Two configs live in the repo; both use `ts-jest` preset + `@swc/jest` transform
+(ESM-only deps — `@mikro-orm`, `kysely`, `uuid`, `@faker-js` — whitelisted via
+`transformIgnorePatterns`). See the files for the full source:
 
-Unit coverage is scoped to `src/domain/entities/` only. The other layers
-(application, infrastructure, presentation) are excluded from unit coverage
-because they are exercised by the E2E suite.
+- `jest.config.js` — unit. `testMatch: src/**/*.spec.ts`, `rootDir: '.'`,
+  coverage scoped to `src/domain/entities/` only (application, infrastructure,
+  presentation excluded — covered by E2E).
+- `test/jest-e2e.js` — e2e. `testMatch: test/**/*.e2e-spec.ts`, `rootDir: '..'`,
+  coverage over all `src/**/*.ts` except `main.ts` and `.spec.ts` files.
 
-## test/jest-e2e.js (e2e)
-
-```javascript
-module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  rootDir: '..',
-  testMatch: ['<rootDir>/test/**/*.e2e-spec.ts'],
-  testPathIgnorePatterns: ['/node_modules/', '/.claude/'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'd.ts'],
-  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
-  coverageDirectory: '<rootDir>/coverage/e2e',
-  coverageReporters: ['text', 'lcov', 'html'],
-  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts', '\\.spec\\.ts$'],
-  coverageThreshold: {
-    global: { lines: 60, functions: 60, branches: 50, statements: 60 },
-  },
-  moduleNameMapper: {
-    '^src/(.*)$': '<rootDir>/src/$1',
-  },
-  transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': ['@swc/jest', {
-      jsc: {
-        parser: { syntax: 'typescript', decorators: true },
-        target: 'es2021',
-        transform: {
-          legacyDecorator: true,
-          decoratorMetadata: true,
-        },
-      },
-      module: { type: 'commonjs' },
-    }],
-  },
-  transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid|@faker-js))'],
-};
-```
+Both enforce the same 60/50 threshold (lines/functions/statements: 60,
+branches: 50) and write lcov to `coverage/unit/` and `coverage/e2e/` respectively.
 
 ## E2E Architecture
 
@@ -334,20 +263,5 @@ pnpm test:e2e:cov
 No `pnpm docker:up` is required for tests. E2E runs entirely on an in-memory
 SQLite database.
 
-## Important Notes
-
-1. **Database**: E2E tests use SQLite in-memory (`:memory:`) — no Docker, no
-   PostgreSQL needed. Unit tests touch no database at all.
-2. **Per-test isolation**: `truncateAll(orm)` clears all rows in `beforeEach`,
-   then the factory re-seeds a known record.
-3. **Schema refresh**: `orm.schema.refresh()` runs once in `beforeAll` (inside
-   `createTestApp`).
-4. **Factory seeding**: seed known records directly into the DB via
-   `BookFactory.createOne(overrides)` rather than HTTP calls. Use this pattern
-   for every new entity's factory.
-5. **Unique IDs**: IDs are UUIDv7, generated on each run.
-6. **ESM transform**: MikroORM 7, uuid 14, and `@faker-js/faker` are ESM-only —
-   `@swc/jest` transforms them to CJS. `transformIgnorePatterns` in both Jest
-   configs whitelists `@mikro-orm`, `kysely`, `uuid`, and `@faker-js`.
-7. **Unit coverage scope**: only `src/domain/entities/` counts toward unit
-   coverage; the rest is covered by E2E.
+Testing rules (factory pattern, coverage scope, ESM transform) live in
+`docs/rules/testing.md` and are loaded via `opencode.json`.

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Factory } from '@mikro-orm/seeder';
+import { v7 as uuidv7 } from 'uuid';
 
 import { BookEntity } from '../entities/book.entity';
 
@@ -16,7 +17,8 @@ export class BookFactory extends Factory<BookEntity> {
   definition(): Partial<BookEntity> {
     return {
       title: faker.book.title(),
-      author: faker.person.fullName(),
+      // ponytail: random UUID; tests that need a real author should override
+      author: uuidv7(),
       isbn: faker.commerce.isbn(),
       publicationYear: faker.number.int({ min: 1900, max: 2025 }),
       genre: faker.book.genre(),

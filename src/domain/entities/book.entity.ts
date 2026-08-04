@@ -2,7 +2,7 @@ import { BaseEntity, type BaseEntityProps, generateBaseEntityProps } from './bas
 
 export interface BookProperties extends BaseEntityProps {
   title: string;
-  author: string;
+  authorId: string;
   isbn: string;
   publicationYear: number;
   genre: string | null;
@@ -10,7 +10,7 @@ export interface BookProperties extends BaseEntityProps {
 
 export interface CreateBookParams {
   title: string;
-  author: string;
+  authorId: string;
   isbn: string;
   publicationYear: number;
   genre?: string | null;
@@ -18,7 +18,7 @@ export interface CreateBookParams {
 
 export interface ReconstructBookParams extends BaseEntityProps {
   title: string;
-  author: string;
+  authorId: string;
   isbn: string;
   publicationYear: number;
   genre: string | null;
@@ -26,7 +26,7 @@ export interface ReconstructBookParams extends BaseEntityProps {
 
 export class Book extends BaseEntity {
   private _title: string;
-  private _author: string;
+  private _authorId: string;
   private readonly _isbn: string;
   private _publicationYear: number;
   private _genre: string | null;
@@ -34,7 +34,7 @@ export class Book extends BaseEntity {
   private constructor(props: BookProperties) {
     super(props);
     this._title = props.title;
-    this._author = props.author;
+    this._authorId = props.authorId;
     this._isbn = props.isbn;
     this._publicationYear = props.publicationYear;
     this._genre = props.genre;
@@ -44,7 +44,7 @@ export class Book extends BaseEntity {
     return new Book({
       ...generateBaseEntityProps(),
       title: params.title,
-      author: params.author,
+      authorId: params.authorId,
       isbn: params.isbn,
       publicationYear: params.publicationYear,
       genre: params.genre ?? null,
@@ -59,8 +59,8 @@ export class Book extends BaseEntity {
     return this._title;
   }
 
-  get author(): string {
-    return this._author;
+  get authorId(): string {
+    return this._authorId;
   }
 
   get isbn(): string {
@@ -80,8 +80,8 @@ export class Book extends BaseEntity {
     this.touch();
   }
 
-  updateAuthor(author: string): void {
-    this._author = author;
+  updateAuthorId(authorId: string): void {
+    this._authorId = authorId;
     this.touch();
   }
 

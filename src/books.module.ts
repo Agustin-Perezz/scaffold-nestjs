@@ -6,6 +6,7 @@ import { DeleteBookUseCase } from './application/use-cases/books/delete-book/del
 import { GetBookUseCase } from './application/use-cases/books/get-book/get-book.use-case';
 import { ListBooksUseCase } from './application/use-cases/books/list-books/list-books.use-case';
 import { UpdateBookUseCase } from './application/use-cases/books/update-book/update-book.use-case';
+import { AuthorEntitySchema } from './infrastructure/database/postgres/entities/author.entity';
 import { BookEntitySchema } from './infrastructure/database/postgres/entities/book.entity';
 import { CreateBookRepository } from './infrastructure/database/postgres/repositories/books/create-book.repository';
 import { DeleteBookRepository } from './infrastructure/database/postgres/repositories/books/delete-book.repository';
@@ -43,6 +44,6 @@ import { BooksController } from './presentation/controllers/books/books.controll
     UpdateBookUseCase,
     DeleteBookUseCase,
   ],
-  imports: [MikroOrmModule.forFeature([BookEntitySchema])],
+  imports: [MikroOrmModule.forFeature([BookEntitySchema, AuthorEntitySchema])],
 })
 export class BooksModule {}

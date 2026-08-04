@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 
 export class CreateBookRequestDto {
   @ApiProperty({
@@ -9,9 +9,9 @@ export class CreateBookRequestDto {
   @IsString()
   title: string;
 
-  @ApiProperty({ description: 'Author name', example: 'Andrew Hunt' })
-  @IsString()
-  author: string;
+  @ApiProperty({ description: 'Author ID', example: '0193b1a0-0000-7bbb-8bbb-000000000001' })
+  @IsUUID()
+  authorId: string;
 
   @ApiProperty({ description: 'ISBN (unique)', example: '978-0135957059' })
   @IsString()

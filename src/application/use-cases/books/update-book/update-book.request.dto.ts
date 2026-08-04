@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsUUID, Max, Min } from 'class-validator';
 
 export class UpdateBookRequestDto {
   @ApiPropertyOptional({ description: 'Book title' })
@@ -7,10 +7,10 @@ export class UpdateBookRequestDto {
   @IsString()
   title?: string;
 
-  @ApiPropertyOptional({ description: 'Author name' })
+  @ApiPropertyOptional({ description: 'Author ID' })
   @IsOptional()
-  @IsString()
-  author?: string;
+  @IsUUID()
+  authorId?: string;
 
   @ApiPropertyOptional({ description: 'Year of publication' })
   @IsOptional()

@@ -22,17 +22,19 @@ export class DeleteBookRepository implements IDeleteBookRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const entity = await this.repository.findOne({ id });
-    if (entity) {
-      await this.repository.getEntityManager().remove(entity).flush();
-    }
+    await this.repository.getEntityManager().transactional(async (em) => {
+      const entity = await em.findOne(BookEntity, { id });
+      if (entity) {
+        await em.remove(entity).flush();
+      }
+    });
   }
 
   private toDomain(entity: BookEntity): Book {
     return Book.reconstruct({
       id: entity.id,
       title: entity.title,
-      author: entity.author,
+      authorId: entity.author,
       isbn: entity.isbn,
       publicationYear: entity.publicationYear,
       genre: entity.genre,

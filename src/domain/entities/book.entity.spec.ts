@@ -3,7 +3,7 @@ import { Book } from './book.entity';
 describe('Book Entity', () => {
   const validParams = {
     title: 'The Pragmatic Programmer',
-    author: 'Andrew Hunt',
+    authorId: '0193b1a0-0000-7bbb-8bbb-000000000001',
     isbn: '978-0135957059',
     publicationYear: 1999,
   };
@@ -16,7 +16,7 @@ describe('Book Entity', () => {
         /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
       );
       expect(book.title).toBe('The Pragmatic Programmer');
-      expect(book.author).toBe('Andrew Hunt');
+      expect(book.authorId).toBe('0193b1a0-0000-7bbb-8bbb-000000000001');
       expect(book.isbn).toBe('978-0135957059');
       expect(book.publicationYear).toBe(1999);
       expect(book.genre).toBe('Software Engineering');
@@ -53,7 +53,7 @@ describe('Book Entity', () => {
       const book = Book.reconstruct({
         id,
         title: 'Clean Code',
-        author: 'Robert Martin',
+        authorId: '0193b1a0-0000-7bbb-8bbb-000000000002',
         isbn: '978-0132350884',
         publicationYear: 2008,
         genre: 'Programming',
@@ -80,14 +80,14 @@ describe('Book Entity', () => {
       expect(book.updatedAt.getTime()).toBeGreaterThan(originalUpdatedAt.getTime());
     });
 
-    it('updateAuthor mutates author and advances updatedAt', async () => {
+    it('updateAuthorId mutates authorId and advances updatedAt', async () => {
       const book = Book.create(validParams);
       const originalUpdatedAt = book.updatedAt;
 
       await new Promise((r) => setTimeout(r, 5));
-      book.updateAuthor('New Author');
+      book.updateAuthorId('0193b1a0-0000-7bbb-8bbb-000000000003');
 
-      expect(book.author).toBe('New Author');
+      expect(book.authorId).toBe('0193b1a0-0000-7bbb-8bbb-000000000003');
       expect(book.updatedAt.getTime()).toBeGreaterThan(originalUpdatedAt.getTime());
     });
 

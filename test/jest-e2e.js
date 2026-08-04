@@ -17,17 +17,20 @@ module.exports = {
     '^src/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': ['@swc/jest', {
-      jsc: {
-        parser: { syntax: 'typescript', decorators: true },
-        target: 'es2021',
-        transform: {
-          legacyDecorator: true,
-          decoratorMetadata: true,
+    '^.+\\.(ts|tsx|js|jsx)$': [
+      '@swc/jest',
+      {
+        jsc: {
+          parser: { syntax: 'typescript', decorators: true },
+          target: 'es2021',
+          transform: {
+            legacyDecorator: true,
+            decoratorMetadata: true,
+          },
         },
+        module: { type: 'commonjs' },
       },
-      module: { type: 'commonjs' },
-    }],
+    ],
   },
   transformIgnorePatterns: ['/node_modules/(?!.*(@mikro-orm|kysely|uuid|@faker-js))'],
 };

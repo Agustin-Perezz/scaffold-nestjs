@@ -19,7 +19,7 @@ export class GetBookUseCase {
     return new GetBookResponseDto({
       id: book.id,
       title: book.title,
-      author: book.author,
+      authorId: book.authorId,
       isbn: book.isbn,
       publicationYear: book.publicationYear,
       genre: book.genre,

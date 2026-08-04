@@ -7,8 +7,8 @@ export class GetBookResponseDto {
   @ApiProperty({ description: 'Book title' })
   title: string;
 
-  @ApiProperty({ description: 'Author name' })
-  author: string;
+  @ApiProperty({ description: 'Author ID' })
+  authorId: string;
 
   @ApiProperty({ description: 'ISBN' })
   isbn: string;

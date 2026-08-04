@@ -18,7 +18,7 @@ export class ListBooksByAuthorRepository implements IListBooksByAuthorRepository
   ) {}
 
   async findAuthorById(id: string): Promise<Author | null> {
-    const entity = await this.authorRepository.findOneOrFail({ id });
+    const entity = await this.authorRepository.findOne({ id });
     if (!entity) {
       return null;
     }

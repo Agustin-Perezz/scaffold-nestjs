@@ -29,7 +29,7 @@ export class GetBookRepository implements IGetBookRepository {
     return Book.reconstruct({
       id: entity.id,
       title: entity.title,
-      author: entity.author,
+      authorId: entity.author,
       isbn: entity.isbn,
       publicationYear: entity.publicationYear,
       genre: entity.genre,

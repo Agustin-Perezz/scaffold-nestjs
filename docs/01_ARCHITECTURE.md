@@ -60,7 +60,7 @@ src/
 │
 ├── infrastructure/
 │   └── database/
-│       ├── database.module.ts             # MikroOrmModule.forRoot (Postgres + SeedManager)
+│       ├── database.module.ts             # MikroOrmModule.forRoot(ormConfig)
 │       └── postgres/
 │           ├── entities/
 │           │   ├── base.entity.ts         # BaseEntitySchema (defineEntity, abstract)
@@ -69,6 +69,8 @@ src/
 │           │   └── book.factory.ts
 │           └── repositories/
 │               └── books/
+│
+├── migrations/                            # MikroORM migration files (TS source)
 │
 └── presentation/
     └── controllers/
@@ -149,11 +151,15 @@ graph TB
     end
 
     subgraph DatabaseModule["DatabaseModule"]
-        A[MikroOrmModule.forRoot<br/>PostgreSQL + SeedManager]
+        A[MikroOrmModule.forRoot<br/>ormConfig from mikro-orm.config.ts]
     end
 
     subgraph BooksModule["BooksModule"]
         B[MikroOrmModule.forFeature]
+    end
+
+    subgraph Config
+        CFG[mikro-orm.config.ts<br/>PostgreSQL + SeedManager + Migrator]
     end
 
     subgraph Entities
@@ -162,13 +168,19 @@ graph TB
 
     DBMOD --> A
     BOOKSMOD --> B
-    A --> B
+    A --> CFG
     B --> C
 ```
 
-`forRoot()` lives in `DatabaseModule` (PostgreSQL + `SeedManager` extension);
-`BooksModule` only registers `forFeature([BookEntitySchema])`. `AppModule`
-imports both, and `main.ts` bootstraps `AppModule`.
+`mikro-orm.config.ts` is the single source of truth for the MikroORM config
+(PostgreSQL driver, `SeedManager` + `Migrator` extensions, entity list,
+migrations path). `DatabaseModule` imports it via `MikroOrmModule.forRoot(ormConfig)`;
+the CLI reads the same file via `configPaths` in `package.json`. `BooksModule`
+only registers `forFeature([BookEntitySchema])`. `AppModule` imports both,
+and `main.ts` bootstraps `AppModule`.
+
+`.env` is loaded by `import 'dotenv/config'` in both `main.ts` (app) and
+`mikro-orm.config.ts` (CLI), so app and CLI resolve the same database.
 
 ## Build and Execution
 
@@ -182,3 +194,36 @@ pnpm start:prod
 # Type check
 npx tsc --noEmit
 ```
+
+## Migrations
+
+Schema changes are tracked as migration files in `src/migrations/`. The
+`Migrator` extension (registered in `mikro-orm.config.ts`) generates and
+applies migrations against the configured PostgreSQL database.
+
+```bash
+# Generate a new migration from the current schema diff
+pnpm migration:create -- --name=create_books_schema
+
+# Apply pending migrations
+pnpm migration:up
+
+# Roll back one migration
+pnpm migration:down
+
+# Show pending / executed migrations
+pnpm migration:pending
+pnpm migration:list
+
+# Drop schema + re-run all migrations
+pnpm migration:fresh
+
+# Verify schema is up to date
+pnpm migration:check
+```
+
+Migration files live in `src/migrations/` (TS source, compiled to
+`dist/migrations/` in production). The migrator config uses `pathTs` for
+development and `path` (compiled JS) for production. Snapshot files
+(`.snapshot-*.json`) are generated alongside migrations and should be
+versioned with them.

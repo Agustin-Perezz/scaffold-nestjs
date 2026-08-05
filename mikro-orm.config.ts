@@ -20,6 +20,7 @@ export const ormConfig = defineConfig({
     disableForeignKeys: true,
     allOrNothing: true,
     emit: 'ts',
+    snapshotName: 'schema',
   },
 });
 

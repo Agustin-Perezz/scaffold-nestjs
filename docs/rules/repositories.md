@@ -175,6 +175,38 @@ Do NOT default `limit`/`offset` in the use case or repository. Defaults
 live in `PaginationRequestDto` (`limit = 10`, `offset = 0`) so there is a
 single source of truth.
 
+## No Inline SQL — Use MikroORM Query Conditions
+
+Never write raw SQL strings (`em.nativeQuery`, `knex().raw`, hand-written
+`SELECT`/`WHERE` fragments). Use MikroORM's query condition objects and
+QueryBuilder — type-safe, parameterized by default (no SQL injection surface),
+portable across drivers.
+
+```typescript
+// ✅ Object filter with $-operators (MikroORM v7 way)
+const recent = await this.repository.find({
+  publicationYear: { $gte: 2000 },
+  authorId: { $in: authorIds },
+});
+
+// ✅ QueryBuilder for complex reads
+const entities = await this.em.createQueryBuilder(BookEntity)
+  .where({ authorId, publicationYear: { $gte: 2000 } })
+  .limit(limit)
+  .offset(offset)
+  .getResultList();
+
+// ❌ Raw SQL — no type safety, injection surface, bypasses identity map
+const result = await this.em.nativeQuery(
+  `SELECT * FROM books WHERE author_id = '${authorId}' AND year >= 2000`,
+);
+```
+
+Supported operators: `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in`,
+`$nin`, `$like`, `$ilike`, `$null`, `$notNull`, `$or`, `$and`, `$elemMatch`.
+Array values auto-convert to `$in`. Raw SQL is only acceptable for migrations
+or DBA-level maintenance scripts — never in repositories.
+
 ## MikroORM Entities
 
 MikroORM entities live in `src/infrastructure/database/entities/` and use

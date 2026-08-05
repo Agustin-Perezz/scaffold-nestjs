@@ -9,7 +9,7 @@ module.exports = {
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
   coverageDirectory: '<rootDir>/coverage/e2e',
   coverageReporters: ['text', 'lcov', 'html'],
-  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts', '\\.spec\\.ts$'],
+  coveragePathIgnorePatterns: ['/node_modules/', '<rootDir>/src/main.ts', '<rootDir>/src/instrument.ts', '\\.spec\\.ts$'],
   coverageThreshold: {
     global: { lines: 60, functions: 60, branches: 50, statements: 60 },
   },

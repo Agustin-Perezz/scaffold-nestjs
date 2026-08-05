@@ -1,5 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
+import { PaginationRequestDto } from '../../../shared/dtos/pagination.request.dto';
 import { IListBooksByAuthorRepository } from './list-books-by-author.repository.interface';
 import {
   AuthorSummaryDto,
@@ -14,13 +15,17 @@ export class ListBooksByAuthorUseCase {
     private readonly repository: IListBooksByAuthorRepository,
   ) {}
 
-  async execute(authorId: string): Promise<ListBooksByAuthorResponseDto> {
+  async execute(
+    authorId: string,
+    pagination: PaginationRequestDto,
+  ): Promise<ListBooksByAuthorResponseDto> {
+    const { limit, offset } = pagination;
     const author = await this.repository.findAuthorById(authorId);
     if (!author) {
       throw new NotFoundException('Author not found');
     }
 
-    const books = await this.repository.findBooksByAuthorId(authorId);
+    const [books, total] = await this.repository.findBooksByAuthorId(authorId, pagination);
 
     return new ListBooksByAuthorResponseDto({
       author: new AuthorSummaryDto({ id: author.id, name: author.name }),
@@ -37,6 +42,9 @@ export class ListBooksByAuthorUseCase {
             updatedAt: book.updatedAt,
           }),
       ),
+      total,
+      limit,
+      offset,
     });
   }
 }

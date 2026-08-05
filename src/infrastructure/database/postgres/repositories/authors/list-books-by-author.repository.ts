@@ -2,6 +2,7 @@ import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 
+import { PaginationRequestDto } from '../../../../../application/shared/dtos/pagination.request.dto';
 import { IListBooksByAuthorRepository } from '../../../../../application/use-cases/authors/list-books-by-author/list-books-by-author.repository.interface';
 import { Author } from '../../../../../domain/entities/author.entity';
 import { Book } from '../../../../../domain/entities/book.entity';
@@ -30,12 +31,17 @@ export class ListBooksByAuthorRepository implements IListBooksByAuthorRepository
     });
   }
 
-  async findBooksByAuthorId(authorId: string): Promise<Book[]> {
-    // Populate the author relation so the FK is consistent; mapping reads
-    // entity.author (mapToPk PK string), populate keeps the relation usable
-    // for future eager loads.
-    const entities = await this.bookRepository.find({ author: authorId }, { populate: ['author'] });
-    return entities.map((e) => this.toDomain(e));
+  async findBooksByAuthorId(
+    authorId: string,
+    pagination: PaginationRequestDto,
+  ): Promise<[Book[], number]> {
+    const { limit, offset } = pagination;
+
+    const [entities, total] = await this.bookRepository.findAndCount(
+      { author: authorId },
+      { limit, offset, populate: ['author'] },
+    );
+    return [entities.map((e) => this.toDomain(e)), total];
   }
 
   private toDomain(entity: BookEntity): Book {

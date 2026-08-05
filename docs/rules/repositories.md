@@ -97,6 +97,84 @@ async create(book: Book): Promise<Book> {
 The repository handles the mapping between domain entity and persistence model.
 Callers never see database specifics (table names, column types, JOINs).
 
+## Pagination on List Repositories
+
+List repositories MUST accept `PaginationRequestDto` and use
+`findAndCount` — one query returns rows and total count. The interface
+returns a tuple `[Entity[], number]`; the use case maps it into a response
+DTO that extends `PaginationResponseDto`.
+
+```typescript
+// ✅ Correct — repository interface
+import { PaginationRequestDto } from '../../../shared/dtos/pagination.request.dto';
+
+export interface IListBooksRepository {
+  findAll(pagination: PaginationRequestDto): Promise<[Book[], number]>;
+}
+
+// ✅ Correct — repository implementation uses findAndCount
+async findAll(pagination: PaginationRequestDto): Promise<[Book[], number]> {
+  const { limit, offset } = pagination;
+  const [entities, total] = await this.repository.findAndCount(
+    {},
+    { limit, offset },
+  );
+  return [entities.map((e) => this.toDomain(e)), total];
+}
+
+// ❌ Wrong — separate find + count (two queries)
+async findAll(): Promise<Book[]> {
+  return (await this.repository.findAll()).map((e) => this.toDomain(e));
+}
+```
+
+`findAndCount` issues one `SELECT ... LIMIT ... OFFSET ...` plus one
+`COUNT(*)`. Two round trips, but a single call — no risk of the two
+results drifting apart.
+
+### Filtering with pagination
+
+When the list is scoped by a foreign key, pass the FK as the filter and
+apply pagination on top:
+
+```typescript
+async findBooksByAuthorId(
+  authorId: string,
+  pagination: PaginationRequestDto,
+): Promise<[Book[], number]> {
+  const { limit, offset } = pagination;
+  const [entities, total] = await this.bookRepository.findAndCount(
+    { author: authorId },
+    { limit, offset },
+  );
+  return [entities.map((e) => this.toDomain(e)), total];
+}
+```
+
+### Use case mapping
+
+The use case receives the tuple and builds a response DTO that extends
+`PaginationResponseDto` — `total`, `limit`, and `offset` come from the
+repository and the request DTO; the domain collection is added by the
+response DTO itself.
+
+```typescript
+async execute(pagination: PaginationRequestDto): Promise<ListBooksResponseDto> {
+  const { limit, offset } = pagination;
+  const [books, total] = await this.repository.findAll(pagination);
+  return new ListBooksResponseDto({
+    books: books.map((b) => new BookResponseDto({ ...b })),
+    total,
+    limit,
+    offset,
+  });
+}
+```
+
+Do NOT default `limit`/`offset` in the use case or repository. Defaults
+live in `PaginationRequestDto` (`limit = 10`, `offset = 0`) so there is a
+single source of truth.
+
 ## MikroORM Entities
 
 MikroORM entities live in `src/infrastructure/database/entities/` and use

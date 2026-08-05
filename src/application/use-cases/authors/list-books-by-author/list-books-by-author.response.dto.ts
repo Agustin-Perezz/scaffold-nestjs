@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { PaginationResponseDto } from '../../../shared/dtos/pagination.response.dto';
+
 export class AuthorSummaryDto {
   @ApiProperty({ description: 'Author unique ID' })
   id: string;
@@ -42,14 +44,16 @@ export class BookByAuthorDto {
   }
 }
 
-export class ListBooksByAuthorResponseDto {
+export class ListBooksByAuthorResponseDto extends PaginationResponseDto {
   @ApiProperty({ description: 'Author summary' })
-  author: AuthorSummaryDto;
+  author?: AuthorSummaryDto;
 
   @ApiProperty({ type: [BookByAuthorDto], description: 'Books by the author' })
   books: BookByAuthorDto[];
 
   constructor(partial: Partial<ListBooksByAuthorResponseDto>) {
-    Object.assign(this, partial);
+    super(partial);
+    this.author = partial.author;
+    this.books = partial.books ?? [];
   }
 }

@@ -9,9 +9,6 @@ const BookEntitySchema = defineEntity({
   extends: BaseEntity,
   properties: {
     title: p.string().index(),
-    // mapToPk: relation exists for FK constraint + inverse oneToMany, but the
-    // property holds the plain PK string (no lazy-load, no Reference wrapper).
-    // Domain mapping reads entity.author directly — always safe.
     author: () => p.manyToOne(AuthorEntitySchema).mapToPk(),
     isbn: p.string().unique(),
     publicationYear: p.integer(),

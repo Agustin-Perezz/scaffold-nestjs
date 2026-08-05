@@ -8,9 +8,11 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { PaginationRequestDto } from '../../../application/shared/dtos/pagination.request.dto';
 import { CreateBookRequestDto } from '../../../application/use-cases/books/create-book/create-book.request.dto';
 import { CreateBookResponseDto } from '../../../application/use-cases/books/create-book/create-book.response.dto';
 import { CreateBookUseCase } from '../../../application/use-cases/books/create-book/create-book.use-case';
@@ -53,8 +55,8 @@ export class BooksController {
     description: 'List of books',
     type: ListBooksResponseDto,
   })
-  async list(): Promise<ListBooksResponseDto> {
-    return this.listBooksUseCase.execute();
+  async list(@Query() pagination: PaginationRequestDto): Promise<ListBooksResponseDto> {
+    return this.listBooksUseCase.execute(pagination);
   }
 
   @Get(':id')

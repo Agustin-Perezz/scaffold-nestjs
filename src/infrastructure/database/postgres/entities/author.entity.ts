@@ -8,9 +8,7 @@ const AuthorEntitySchema = defineEntity({
   tableName: 'authors',
   extends: BaseEntity,
   properties: {
-    // ponytail: no unique constraint; add existsByName if anti-duplicate is required
     name: p.string(),
-    // One-to-many: load an author's books via populate('books')
     books: () => p.oneToMany(BookEntitySchema).mappedBy('author'),
   },
 });

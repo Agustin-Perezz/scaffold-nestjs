@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { PaginationRequestDto } from '../../../application/shared/dtos/pagination.request.dto';
 import { CreateAuthorRequestDto } from '../../../application/use-cases/authors/create-author/create-author.request.dto';
 import { CreateAuthorResponseDto } from '../../../application/use-cases/authors/create-author/create-author.response.dto';
 import { CreateAuthorUseCase } from '../../../application/use-cases/authors/create-author/create-author.use-case';
@@ -36,7 +37,10 @@ export class AuthorsController {
     type: ListBooksByAuthorResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Author not found' })
-  async listBooks(@Param('id') id: string): Promise<ListBooksByAuthorResponseDto> {
-    return this.listBooksByAuthorUseCase.execute(id);
+  async listBooks(
+    @Param('id') id: string,
+    @Query() pagination: PaginationRequestDto,
+  ): Promise<ListBooksByAuthorResponseDto> {
+    return this.listBooksByAuthorUseCase.execute(id, pagination);
   }
 }

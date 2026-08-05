@@ -62,19 +62,12 @@ pnpm test:cov            # Unit tests + coverage (coverage/unit/)
 pnpm test:e2e:cov        # E2E tests + coverage (coverage/e2e/)
 ```
 
-## URLs
-
-| Service   | URL                          |
-|-----------|------------------------------|
-| API       | http://localhost:3000        |
-| Swagger   | http://localhost:3000/api    |
-| Database  | PostgreSQL (see docker-compose.yml) |
-
 ## Rules and Checklists
 
 Rules and checklists live in `docs/` and are loaded automatically by OpenCode
 via `opencode.json`:
 
+- `docs/rules/coding-standars.md` — clean code 
 - `docs/rules/domain.md` — pure domain, no decorators, factory methods
 - `docs/rules/use-cases.md` — one folder per operation, DTOs, interfaces
 - `docs/rules/repositories.md` — one repo per operation, transactions
@@ -83,10 +76,3 @@ via `opencode.json`:
 - `docs/checklists/new-domain.md` — add a new domain (autos, clientes, etc.)
 - `docs/checklists/new-use-case.md` — add a new use case to an existing domain
 - `docs/checklists/new-entity.md` — add a new entity to an existing domain
-
-## Code Locations
-
-- `src/domain/entities/` — Domain entities
-- `src/application/use-cases/` — Use cases (one folder per operation)
-- `src/infrastructure/` — Repository implementations, MikroORM, config
-- `src/presentation/` — Controllers, DTOs, Swagger

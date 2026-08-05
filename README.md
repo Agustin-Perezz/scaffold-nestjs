@@ -100,6 +100,8 @@ pnpm docker:logs
 | `DB_NAME` | Database name | books |
 | `PORT` | API port | 3000 |
 | `NODE_ENV` | Environment (development/production) | development |
+| `SENTRY_DSN` | Sentry DSN (only sent in production) | - |
+| `SENTRY_TRACES_SAMPLE_RATE` | Sentry tracing sample rate (0.0 to 1.0) | 0.1 |
 
 ## Main Commands
 

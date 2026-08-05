@@ -86,3 +86,4 @@ pnpm check              # Lint + format + organize imports
 - **Documentation**: Swagger (OpenAPI 3.0)
 - **Testing**: Jest 30 + Supertest
 - **Seeding / Factories**: `@mikro-orm/seeder`, `@faker-js/faker`
+- **Monitoring**: Sentry (`@sentry/nestjs`, disabled in dev, env-configurable in prod)

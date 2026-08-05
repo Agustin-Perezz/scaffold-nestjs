@@ -12,6 +12,7 @@ module.exports = {
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '<rootDir>/src/main.ts',
+    '<rootDir>/src/instrument.ts',
     '<rootDir>/src/app.module.ts',
     '<rootDir>/src/books.module.ts',
     '<rootDir>/src/application/',

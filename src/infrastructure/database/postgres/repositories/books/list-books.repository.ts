@@ -2,6 +2,7 @@ import { EntityRepository } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
 
+import { PaginationRequestDto } from '../../../../../application/shared/dtos/pagination.request.dto';
 import { IListBooksRepository } from '../../../../../application/use-cases/books/list-books/list-books.repository.interface';
 import { Book } from '../../../../../domain/entities/book.entity';
 import { BookEntity } from '../../entities/book.entity';
@@ -13,9 +14,11 @@ export class ListBooksRepository implements IListBooksRepository {
     private readonly repository: EntityRepository<BookEntity>,
   ) {}
 
-  async findAll(): Promise<Book[]> {
-    const entities = await this.repository.findAll();
-    return entities.map((e) => this.toDomain(e));
+  async findAll(pagination: PaginationRequestDto): Promise<[Book[], number]> {
+    const { limit, offset } = pagination;
+
+    const [entities, total] = await this.repository.findAndCount({}, { limit, offset });
+    return [entities.map((e) => this.toDomain(e)), total];
   }
 
   private toDomain(entity: BookEntity): Book {

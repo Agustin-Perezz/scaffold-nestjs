@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
+import { PaginationRequestDto } from '../../../shared/dtos/pagination.request.dto';
 import { IListBooksRepository } from './list-books.repository.interface';
 import { BookResponseDto, ListBooksResponseDto } from './list-books.response.dto';
 
@@ -10,8 +11,9 @@ export class ListBooksUseCase {
     private readonly repository: IListBooksRepository,
   ) {}
 
-  async execute(): Promise<ListBooksResponseDto> {
-    const books = await this.repository.findAll();
+  async execute(pagination: PaginationRequestDto): Promise<ListBooksResponseDto> {
+    const { limit, offset } = pagination;
+    const [books, total] = await this.repository.findAll(pagination);
     return new ListBooksResponseDto({
       books: books.map(
         (book) =>
@@ -26,6 +28,9 @@ export class ListBooksUseCase {
             updatedAt: book.updatedAt,
           }),
       ),
+      total,
+      limit,
+      offset,
     });
   }
 }

@@ -21,15 +21,23 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f postgres",
+    "migration:create": "mikro-orm migration:create",
+    "migration:up": "mikro-orm migration:up",
+    "migration:down": "mikro-orm migration:down",
+    "migration:list": "mikro-orm migration:list",
+    "migration:pending": "mikro-orm migration:pending",
+    "migration:fresh": "mikro-orm migration:fresh",
+    "migration:check": "mikro-orm migration:check",
     "prepare": "husky",
     "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@faker-js/faker": "^10.5.0",
-    "@mikro-orm/core": "^7.1.9",
+    "@mikro-orm/core": "^7.1.10",
+    "@mikro-orm/migrations": "^7.1.10",
     "@mikro-orm/nestjs": "^7.0.2",
-    "@mikro-orm/postgresql": "^7.1.9",
-    "@mikro-orm/seeder": "^7.1.8",
+    "@mikro-orm/postgresql": "^7.1.10",
+    "@mikro-orm/seeder": "^7.1.10",
     "@nestjs/common": "^11.1.28",
     "@nestjs/core": "^11.1.28",
     "@nestjs/platform-express": "^11.1.28",
@@ -47,9 +55,17 @@
       "biome check --write"
     ]
   },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./mikro-orm.config.ts",
+      "./dist/mikro-orm.config.js"
+    ]
+  },
   "devDependencies": {
     "@biomejs/biome": "2.5.6",
-    "@mikro-orm/sqlite": "^7.1.9",
+    "@mikro-orm/cli": "^7.1.10",
+    "@mikro-orm/sqlite": "^7.1.10",
     "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.28",
@@ -66,6 +82,7 @@
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.12",
     "ts-node": "^10.9.2",
+    "tsx": "^4.23.7",
     "typescript": "^6.0.3"
   }
 }

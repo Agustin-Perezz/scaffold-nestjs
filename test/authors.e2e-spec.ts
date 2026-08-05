@@ -50,7 +50,7 @@ describe('Authors Controller (e2e)', () => {
   });
 
   describe('/authors/:id/books (GET)', () => {
-    it('should return author and their books', async () => {
+    it('should return author and their books with pagination metadata', async () => {
       await new BookFactory(orm.em).createOne({
         title: 'The Pragmatic Programmer',
         author: authorId,
@@ -69,6 +69,30 @@ describe('Authors Controller (e2e)', () => {
           expect(response.body.books.length).toBe(1);
           expect(response.body.books[0].title).toBe('The Pragmatic Programmer');
           expect(response.body.books[0].authorId).toBe(authorId);
+          expect(response.body.total).toBe(1);
+          expect(response.body.limit).toBe(10);
+          expect(response.body.offset).toBe(0);
+        });
+    });
+
+    it('should respect limit and offset', async () => {
+      for (let i = 0; i < 3; i++) {
+        await new BookFactory(orm.em).createOne({
+          title: `Book ${i}`,
+          author: authorId,
+          isbn: `978-000000000${i + 1}`,
+          publicationYear: 2000 + i,
+        });
+      }
+
+      return request(app.getHttpServer())
+        .get(`/authors/${authorId}/books?limit=2&offset=1`)
+        .expect(200)
+        .then((response) => {
+          expect(response.body.books.length).toBe(2);
+          expect(response.body.total).toBe(3);
+          expect(response.body.limit).toBe(2);
+          expect(response.body.offset).toBe(1);
         });
     });
 
@@ -79,6 +103,7 @@ describe('Authors Controller (e2e)', () => {
         .then((response) => {
           expect(response.body.author.id).toBe(authorId);
           expect(response.body.books).toEqual([]);
+          expect(response.body.total).toBe(0);
         });
     });
 

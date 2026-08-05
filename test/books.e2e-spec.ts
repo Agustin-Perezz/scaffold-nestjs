@@ -118,7 +118,7 @@ describe('Books Controller (e2e)', () => {
   });
 
   describe('/books (GET)', () => {
-    it('should list all books', () => {
+    it('should list books with pagination metadata', () => {
       return request(app.getHttpServer())
         .get('/books')
         .expect(200)
@@ -126,6 +126,37 @@ describe('Books Controller (e2e)', () => {
           expect(response.body).toHaveProperty('books');
           expect(Array.isArray(response.body.books)).toBe(true);
           expect(response.body.books.length).toBeGreaterThan(0);
+          expect(response.body).toHaveProperty('total');
+          expect(response.body).toHaveProperty('limit');
+          expect(response.body).toHaveProperty('offset');
+          expect(typeof response.body.total).toBe('number');
+          expect(response.body.limit).toBe(10);
+          expect(response.body.offset).toBe(0);
+        });
+    });
+
+    it('should respect limit and offset query params', async () => {
+      await new BookFactory(orm.em).createOne({
+        title: 'Second Book',
+        author: authorId,
+        isbn: '978-0000000002',
+        publicationYear: 2001,
+      });
+      await new BookFactory(orm.em).createOne({
+        title: 'Third Book',
+        author: authorId,
+        isbn: '978-0000000003',
+        publicationYear: 2002,
+      });
+
+      return request(app.getHttpServer())
+        .get('/books?limit=2&offset=1')
+        .expect(200)
+        .then((response) => {
+          expect(response.body.books.length).toBe(2);
+          expect(response.body.total).toBe(3);
+          expect(response.body.limit).toBe(2);
+          expect(response.body.offset).toBe(1);
         });
     });
   });
